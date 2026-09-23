@@ -1,0 +1,440 @@
+{
+  "id": "scenario-01",
+  "caseId": "case-001",
+  "isDefault": true,
+  "tables": [
+    {
+      "name": "suspects",
+      "description": "Pessoas relacionadas à investigação.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "age",
+          "type": "INTEGER"
+        },
+        {
+          "name": "occupation",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Laura Torres",
+          "age": 42,
+          "occupation": "Curadora"
+        },
+        {
+          "id": 2,
+          "name": "Carlos Mendes",
+          "age": 37,
+          "occupation": "Segurança"
+        },
+        {
+          "id": 3,
+          "name": "Ricardo Alves",
+          "age": 51,
+          "occupation": "Colecionador"
+        },
+        {
+          "id": 4,
+          "name": "Beatriz Costa",
+          "age": 33,
+          "occupation": "Restauradora"
+        },
+        {
+          "id": 5,
+          "name": "Eduardo Lima",
+          "age": 29,
+          "occupation": "Técnico de manutenção"
+        },
+        {
+          "id": 6,
+          "name": "Marina Lopes",
+          "age": 31,
+          "occupation": "Jornalista"
+        },
+        {
+          "id": 7,
+          "name": "Fernando Reis",
+          "age": 58,
+          "occupation": "Diretor do museu"
+        },
+        {
+          "id": 8,
+          "name": "Sofia Moreira",
+          "age": 22,
+          "occupation": "Estagiária"
+        }
+      ]
+    },
+    {
+      "name": "rooms",
+      "description": "Salas existentes no Museu Bellmont.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "floor",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Hall Principal",
+          "floor": 1
+        },
+        {
+          "id": 2,
+          "name": "Galeria Moderna",
+          "floor": 1
+        },
+        {
+          "id": 3,
+          "name": "Galeria Histórica",
+          "floor": 2
+        },
+        {
+          "id": 4,
+          "name": "Sala Bellmont",
+          "floor": 2
+        },
+        {
+          "id": 5,
+          "name": "Sala de Restauração",
+          "floor": 2
+        },
+        {
+          "id": 6,
+          "name": "Depósito",
+          "floor": 0
+        },
+        {
+          "id": 7,
+          "name": "Sala Administrativa",
+          "floor": 3
+        },
+        {
+          "id": 8,
+          "name": "Cafeteria",
+          "floor": 1
+        },
+        {
+          "id": 9,
+          "name": "Loja do Museu",
+          "floor": 1
+        }
+      ]
+    },
+    {
+      "name": "visits",
+      "description": "Horários de entrada e saída das pessoas no museu.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "entry_time",
+          "type": "TEXT"
+        },
+        {
+          "name": "exit_time",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 1,
+          "entry_time": "09:10",
+          "exit_time": "21:20"
+        },
+        {
+          "id": 2,
+          "suspect_id": 2,
+          "entry_time": "17:45",
+          "exit_time": "22:10"
+        },
+        {
+          "id": 3,
+          "suspect_id": 3,
+          "entry_time": "18:40",
+          "exit_time": "20:35"
+        },
+        {
+          "id": 4,
+          "suspect_id": 4,
+          "entry_time": "10:20",
+          "exit_time": "19:30"
+        },
+        {
+          "id": 5,
+          "suspect_id": 5,
+          "entry_time": "18:30",
+          "exit_time": "21:15"
+        },
+        {
+          "id": 6,
+          "suspect_id": 6,
+          "entry_time": "17:15",
+          "exit_time": "19:40"
+        },
+        {
+          "id": 7,
+          "suspect_id": 7,
+          "entry_time": "08:00",
+          "exit_time": "20:10"
+        },
+        {
+          "id": 8,
+          "suspect_id": 8,
+          "entry_time": "13:20",
+          "exit_time": "20:18"
+        }
+      ]
+    },
+    {
+      "name": "access_logs",
+      "description": "Registros de cartões utilizados para acessar salas.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "room_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "time",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 1,
+          "room_id": 4,
+          "time": "18:30"
+        },
+        {
+          "id": 2,
+          "suspect_id": 1,
+          "room_id": 4,
+          "time": "20:34"
+        },
+        {
+          "id": 3,
+          "suspect_id": 2,
+          "room_id": 1,
+          "time": "19:10"
+        },
+        {
+          "id": 4,
+          "suspect_id": 2,
+          "room_id": 4,
+          "time": "20:36"
+        },
+        {
+          "id": 5,
+          "suspect_id": 3,
+          "room_id": 2,
+          "time": "20:02"
+        },
+        {
+          "id": 6,
+          "suspect_id": 3,
+          "room_id": 3,
+          "time": "20:28"
+        },
+        {
+          "id": 7,
+          "suspect_id": 5,
+          "room_id": 6,
+          "time": "20:20"
+        },
+        {
+          "id": 8,
+          "suspect_id": 5,
+          "room_id": 5,
+          "time": "20:44"
+        },
+        {
+          "id": 9,
+          "suspect_id": 7,
+          "room_id": 7,
+          "time": "19:55"
+        },
+        {
+          "id": 10,
+          "suspect_id": 8,
+          "room_id": 4,
+          "time": "19:40"
+        }
+      ]
+    },
+    {
+      "name": "camera_logs",
+      "description": "Eventos identificados pelas câmeras do museu.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "camera",
+          "type": "TEXT"
+        },
+        {
+          "name": "room_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "time",
+          "type": "TEXT"
+        },
+        {
+          "name": "event",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "camera": "CAM-01",
+          "room_id": 1,
+          "suspect_id": 3,
+          "time": "20:31",
+          "event": "Caminhando em direção à saída"
+        },
+        {
+          "id": 2,
+          "camera": "CAM-04",
+          "room_id": 4,
+          "suspect_id": 1,
+          "time": "20:37",
+          "event": "Deixando o corredor da Sala Bellmont"
+        },
+        {
+          "id": 3,
+          "camera": "CAM-04",
+          "room_id": 4,
+          "suspect_id": 2,
+          "time": "20:39",
+          "event": "Entrando no corredor da Sala Bellmont"
+        },
+        {
+          "id": 4,
+          "camera": "CAM-02",
+          "room_id": 1,
+          "suspect_id": 1,
+          "time": "20:43",
+          "event": "Atravessando o Hall Principal"
+        },
+        {
+          "id": 5,
+          "camera": "CAM-06",
+          "room_id": 6,
+          "suspect_id": 5,
+          "time": "20:42",
+          "event": "Realizando manutenção"
+        },
+        {
+          "id": 6,
+          "camera": "CAM-04",
+          "room_id": 4,
+          "suspect_id": 2,
+          "time": "20:52",
+          "event": "Deixando o corredor da Sala Bellmont"
+        }
+      ]
+    },
+    {
+      "name": "interviews",
+      "description": "Depoimentos fornecidos pelos suspeitos.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "statement",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 1,
+          "statement": "Entrei na Sala Bellmont para conferir a iluminação e saí poucos minutos depois."
+        },
+        {
+          "id": 2,
+          "suspect_id": 2,
+          "statement": "Fiz apenas minha ronda normal. Não entrei na Sala Bellmont naquela noite."
+        },
+        {
+          "id": 3,
+          "suspect_id": 3,
+          "statement": "Estava observando a Galeria Histórica e fui embora pouco depois das oito e meia."
+        },
+        {
+          "id": 4,
+          "suspect_id": 4,
+          "statement": "Meu trabalho terminou antes do período noturno."
+        },
+        {
+          "id": 5,
+          "suspect_id": 5,
+          "statement": "Passei praticamente toda a noite resolvendo problemas de manutenção."
+        },
+        {
+          "id": 6,
+          "suspect_id": 6,
+          "statement": "Terminei minhas entrevistas e deixei o museu antes das oito."
+        },
+        {
+          "id": 7,
+          "suspect_id": 7,
+          "statement": "Saí depois de terminar uma reunião administrativa."
+        },
+        {
+          "id": 8,
+          "suspect_id": 8,
+          "statement": "Ajudei na organização das salas durante a tarde e fui embora no início da noite."
+        }
+      ]
+    }
+  ]
+}
