@@ -1,0 +1,24 @@
+[
+  {
+    "id": "case-001",
+    "number": "CASO #001",
+    "title": "O Quadro Desaparecido",
+    "difficulty": "Iniciante",
+    "description": "Uma valiosa pintura desapareceu durante a noite no Museu Bellmont.",
+    "concepts": [
+      "SELECT",
+      "FROM",
+      "WHERE"
+    ],
+    "available": true,
+    "briefing": {
+      "npcName": "Inspetor Duarte",
+      "npcRole": "Chefe da Divisão de Crimes Especiais",
+      "location": "Museu Bellmont",
+      "crime": "Roubo de obra de arte",
+      "time": "20:30 — 20:50",
+      "speech": "Temos um problema no Museu Bellmont. A pintura Paisagem de Outono desapareceu durante a noite. Funcionários, visitantes e prestadores ainda estavam no prédio. Os registros digitais do museu estão à sua disposição. Descubra quem levou a obra.",
+      "mission": "Consulte os registros digitais do Museu Bellmont utilizando SQL, analise as informações retornadas e identifique quem foi responsável pelo roubo."
+    }
+  }
+]
