@@ -19,6 +19,43 @@
       "time": "20:30 — 20:50",
       "speech": "Temos um problema no Museu Bellmont. A pintura Paisagem de Outono desapareceu durante a noite. Funcionários, visitantes e prestadores ainda estavam no prédio. Os registros digitais do museu estão à sua disposição. Descubra quem levou a obra.",
       "mission": "Consulte os registros digitais do Museu Bellmont utilizando SQL, analise as informações retornadas e identifique quem foi responsável pelo roubo."
+    },
+    "gameplay": {
+      "guide": {
+        "npcName": "Inspetor Duarte",
+        "step": 1,
+        "totalSteps": 4,
+        "title": "Quem ainda estava no museu?",
+        "message": "Preciso que você descubra quem ainda estava no museu durante o horário do crime.",
+        "objective": "Identifique quem permaneceu no museu depois das 20:30.",
+        "suggestedTable": "visits",
+        "hints": [
+          "A tabela visits registra os horários de entrada e saída das pessoas.",
+          "Observe principalmente a coluna exit_time.",
+          "Tente procurar registros cujo exit_time seja maior ou igual a '20:30'."
+        ]
+      },
+      "sqlPalette": {
+        "keywords": [
+          "SELECT",
+          "FROM",
+          "WHERE"
+        ],
+        "tables": [
+          "visits"
+        ],
+        "columns": [
+          "*",
+          "visits.suspect_id",
+          "visits.exit_time"
+        ],
+        "operators": [
+          ">="
+        ],
+        "values": [
+          "'20:30'"
+        ]
+      }
     }
   }
 ]

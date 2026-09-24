@@ -1,3 +1,7 @@
+import type {
+  GameplayConfig,
+} from '../../../shared/types/gameplay'
+
 export type CaseDifficulty =
   | 'Iniciante'
   | 'Básico'
@@ -30,4 +34,6 @@ export interface GameCase {
   available: boolean
 
   briefing: CaseBriefing
+
+  gameplay: GameplayConfig
 }

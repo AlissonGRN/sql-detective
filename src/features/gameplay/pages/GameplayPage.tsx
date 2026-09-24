@@ -13,7 +13,9 @@ import {
 
 import { DatabaseExplorer } from '../components/DatabaseExplorer'
 import { GameHeader } from '../components/GameHeader'
+import { InvestigationGuide } from '../components/InvestigationGuide'
 import { SqlBuilder } from '../components/SqlBuilder/SqlBuilder'
+import { SuspectModal } from '../components/SuspectModal'
 
 import {
   getInitialScenarioForCase,
@@ -30,6 +32,16 @@ export function GameplayPage() {
     executedQuery,
     setExecutedQuery,
   ] = useState<string | null>(null)
+
+  const [
+    isSuspectModalOpen,
+    setIsSuspectModalOpen,
+  ] = useState(false)
+
+  const [
+    selectedCulpritId,
+    setSelectedCulpritId,
+  ] = useState<number | null>(null)
 
   if (!caseId) {
     return (
@@ -57,6 +69,12 @@ export function GameplayPage() {
     )
   }
 
+  const suspectsTable =
+    scenario.tables.find(
+      (table) =>
+        table.name === 'suspects',
+    )
+
   const handleExecuteQuery = (
     query: string,
   ) => {
@@ -77,7 +95,7 @@ export function GameplayPage() {
       <div
         className="
           mx-auto
-          max-w-[1450px]
+          max-w-[1550px]
         "
       >
         <GameHeader
@@ -87,6 +105,11 @@ export function GameplayPage() {
           caseTitle={
             gameCase.title
           }
+          onAnalyzeSuspects={() =>
+            setIsSuspectModalOpen(
+              true,
+            )
+          }
         />
 
         <section
@@ -95,17 +118,29 @@ export function GameplayPage() {
             grid-cols-1
             gap-7
 
-            lg:grid-cols-[280px_minmax(0,1fr)]
+            xl:grid-cols-[245px_minmax(0,1fr)_300px]
           "
         >
+          {/* DATABASE */}
+
           <DatabaseExplorer
             databaseName="bell_db"
             tables={scenario.tables}
+            suggestedTable={
+              gameCase.gameplay.guide
+                .suggestedTable
+            }
           />
+
+          {/* CENTRO */}
 
           <div className="space-y-8">
             <SqlBuilder
               tables={scenario.tables}
+              paletteConfig={
+                gameCase.gameplay
+                  .sqlPalette
+              }
               onExecute={
                 handleExecuteQuery
               }
@@ -219,8 +254,43 @@ export function GameplayPage() {
               )}
             </section>
           </div>
+
+          {/* GUIA */}
+
+          <div
+            className="
+              xl:sticky
+              xl:top-6
+            "
+          >
+            <InvestigationGuide
+              config={
+                gameCase.gameplay.guide
+              }
+            />
+          </div>
         </section>
       </div>
+
+      {isSuspectModalOpen &&
+        suspectsTable && (
+          <SuspectModal
+            suspects={
+              suspectsTable.rows
+            }
+            initialSelectedId={
+              selectedCulpritId
+            }
+            onClose={() =>
+              setIsSuspectModalOpen(
+                false,
+              )
+            }
+            onConfirm={
+              setSelectedCulpritId
+            }
+          />
+        )}
     </main>
   )
 }

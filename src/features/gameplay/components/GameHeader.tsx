@@ -3,11 +3,14 @@ import { Link } from 'react-router'
 interface GameHeaderProps {
   caseNumber: string
   caseTitle: string
+
+  onAnalyzeSuspects: () => void
 }
 
 export function GameHeader({
   caseNumber,
   caseTitle,
+  onAnalyzeSuspects,
 }: GameHeaderProps) {
   return (
     <header
@@ -55,18 +58,46 @@ export function GameHeader({
         </h1>
       </div>
 
-      <div
+      <button
+        type="button"
+        onClick={onAnalyzeSuspects}
         className="
-          font-serif
+          flex
+          items-center
+          gap-2
+          bg-[#c5a56e]
+          px-4
+          py-3
+          font-mono
+          text-[10px]
           font-bold
-          tracking-[0.2em]
+          text-[#28231b]
+          shadow
+          transition
+
+          hover:bg-[#d1b276]
         "
       >
-        SQL{' '}
-        <span className="text-[#9e3030]">
-          DETECTIVE
-        </span>
-      </div>
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="h-4 w-4"
+        >
+          <circle
+            cx="11"
+            cy="11"
+            r="7"
+          />
+
+          <path
+            d="m20 20-3.5-3.5"
+          />
+        </svg>
+
+        ANALISAR SUSPEITOS
+      </button>
     </header>
   )
 }

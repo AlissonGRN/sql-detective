@@ -11,11 +11,14 @@ import type {
 interface DatabaseExplorerProps {
   databaseName: string
   tables: GameTable[]
+
+  suggestedTable?: string
 }
 
 export function DatabaseExplorer({
   databaseName,
   tables,
+  suggestedTable,
 }: DatabaseExplorerProps) {
   const [
     selectedTable,
@@ -80,135 +83,121 @@ export function DatabaseExplorer({
               text-[#817663]
             "
           >
-            {tables.length} tabelas disponíveis
+            {tables.length} tabelas
           </p>
         </header>
 
         <div
           className="
-            max-h-[650px]
-            space-y-3
+            max-h-[680px]
+            space-y-2
             overflow-y-auto
             pr-1
           "
         >
-          {tables.map((table) => (
-            <button
-              key={table.name}
-              type="button"
-              onClick={() =>
-                handleSelectTable(
-                  table,
-                )
-              }
-              className="
-                group
-                w-full
-                border
-                border-[#aa9d84]
-                text-left
-                transition
-                hover:-translate-y-0.5
-                hover:border-[#756955]
-                hover:shadow-md
-              "
-            >
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                  gap-3
-                  bg-[#302e29]
-                  px-3
-                  py-2
-                  text-[#e8dfcc]
-                "
+          {tables.map((table) => {
+            const isSuggested =
+              table.name ===
+              suggestedTable
+
+            return (
+              <button
+                key={table.name}
+                type="button"
+                onClick={() =>
+                  handleSelectTable(
+                    table,
+                  )
+                }
+                className={`
+                  w-full
+                  border
+                  text-left
+                  transition
+
+                  hover:border-[#756955]
+
+                  ${isSuggested
+                    ? `
+                          border-2
+                          border-[#7b2020]
+                        `
+                    : `
+                          border-[#aa9d84]
+                        `
+                  }
+                `}
               >
-                <strong
-                  className="
-                    font-mono
-                    text-xs
-                  "
-                >
-                  {table.name}
-                </strong>
-
-                <span
-                  className="
-                    font-mono
-                    text-[9px]
-                    text-neutral-500
-                  "
-                >
-                  {table.rows.length}
-                </span>
-              </div>
-
-              <div
-                className="
-                  px-3
-                  py-3
-                "
-              >
-                <p
-                  className="
-                    mb-3
-                    font-serif
-                    text-[11px]
-                    leading-4
-                    text-[#665c4d]
-                  "
-                >
-                  {table.description}
-                </p>
-
                 <div
                   className="
                     flex
-                    flex-wrap
-                    gap-1
+                    items-center
+                    justify-between
+                    gap-2
+                    bg-[#302e29]
+                    px-3
+                    py-2
                   "
                 >
-                  {table.columns.map(
-                    (column) => (
-                      <span
-                        key={
-                          column.name
-                        }
-                        className="
-                          bg-black/5
-                          px-2
-                          py-1
-                          font-mono
-                          text-[8px]
-                          text-[#665c4d]
-                        "
-                      >
-                        {column.name}
-                      </span>
-                    ),
+                  <strong
+                    className="
+                      font-mono
+                      text-xs
+                      text-[#e8dfcc]
+                    "
+                  >
+                    {table.name}
+                  </strong>
+
+                  {isSuggested ? (
+                    <span
+                      className="
+                        font-mono
+                        text-[7px]
+                        font-bold
+                        text-[#dca5a5]
+                      "
+                    >
+                      SUGERIDA
+                    </span>
+                  ) : (
+                    <span
+                      className="
+                        font-mono
+                        text-[8px]
+                        text-neutral-500
+                      "
+                    >
+                      {table.rows.length}
+                    </span>
                   )}
                 </div>
 
                 <div
                   className="
-                    mt-3
-                    text-right
-                    font-mono
-                    text-[8px]
-                    font-bold
-                    text-[#7b2020]
-                    opacity-0
-                    transition
-                    group-hover:opacity-100
+                    px-3
+                    py-2
                   "
                 >
-                  VISUALIZAR →
+                  <p
+                    className="
+                      truncate
+                      font-mono
+                      text-[8px]
+                      text-[#665c4d]
+                    "
+                  >
+                    {table.columns
+                      .map(
+                        (column) =>
+                          column.name,
+                      )
+                      .join(' · ')}
+                  </p>
                 </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            )
+          })}
         </div>
       </aside>
 

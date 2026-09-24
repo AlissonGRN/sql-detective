@@ -7,8 +7,14 @@ import type {
   GameTable,
 } from '../../types/database'
 
+import type {
+  SqlPaletteConfig,
+} from '../../../../shared/types/gameplay'
+
 interface SqlBuilderProps {
   tables: GameTable[]
+
+  paletteConfig: SqlPaletteConfig
 
   onExecute: (
     query: string,
@@ -17,6 +23,7 @@ interface SqlBuilderProps {
 
 export function SqlBuilder({
   tables,
+  paletteConfig,
   onExecute,
 }: SqlBuilderProps) {
   const {
@@ -53,8 +60,6 @@ export function SqlBuilder({
         before:bg-[#292824]
       "
     >
-      {/* HEADER */}
-
       <header
         className="
           mb-5
@@ -102,8 +107,8 @@ export function SqlBuilder({
 
       <section
         className="
-          mb-6
-          min-h-[130px]
+          mb-5
+          min-h-[115px]
           border-2
           border-dashed
           border-[#504c43]
@@ -115,7 +120,7 @@ export function SqlBuilder({
           <div
             className="
               flex
-              min-h-[95px]
+              min-h-[80px]
               items-center
               justify-center
             "
@@ -159,11 +164,11 @@ export function SqlBuilder({
         )}
       </section>
 
-      {/* SQL TEXT */}
+      {/* SQL GERADO */}
 
       <div
         className="
-          mb-6
+          mb-5
           border-l-2
           border-[#7d2929]
           bg-black/10
@@ -195,18 +200,15 @@ export function SqlBuilder({
         </code>
       </div>
 
-      {/* PALETA */}
-
       <SqlBlockPalette
         tables={tables}
+        config={paletteConfig}
         onAddBlock={addBlock}
       />
 
-      {/* ACTIONS */}
-
       <footer
         className="
-          mt-7
+          mt-6
           flex
           justify-between
           gap-4
@@ -226,12 +228,10 @@ export function SqlBuilder({
             border-[#625c50]
             px-5
             py-3
-
             font-mono
             text-xs
             font-bold
             text-[#aaa18e]
-
             transition
 
             hover:bg-white/5
@@ -251,12 +251,10 @@ export function SqlBuilder({
             bg-[#7d2929]
             px-7
             py-3
-
             font-mono
             text-xs
             font-bold
             text-[#f1e8d6]
-
             transition
 
             hover:bg-[#963232]
