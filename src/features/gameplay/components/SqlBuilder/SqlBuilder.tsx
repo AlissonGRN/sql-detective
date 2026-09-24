@@ -16,6 +16,8 @@ interface SqlBuilderProps {
 
   paletteConfig: SqlPaletteConfig
 
+  disabled?: boolean
+
   onExecute: (
     query: string,
   ) => void
@@ -24,6 +26,7 @@ interface SqlBuilderProps {
 export function SqlBuilder({
   tables,
   paletteConfig,
+  disabled = false,
   onExecute,
 }: SqlBuilderProps) {
   const {
@@ -246,7 +249,7 @@ export function SqlBuilder({
         <button
           type="button"
           onClick={handleExecute}
-          disabled={!query}
+          disabled={!query || disabled}
           className="
             bg-[#7d2929]
             px-7
