@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useState,
 } from 'react'
 
@@ -8,29 +9,47 @@ import type {
 
 interface InvestigationGuideProps {
   config: InvestigationGuideConfig
+
+  currentStepIndex: number
 }
 
 export function InvestigationGuide({
   config,
+  currentStepIndex,
 }: InvestigationGuideProps) {
   const [
     hintIndex,
     setHintIndex,
-  ] = useState<number | null>(null)
+  ] = useState<number | null>(
+    null,
+  )
+
+  const step =
+    config.steps[
+    currentStepIndex
+    ]
+
+  useEffect(() => {
+    setHintIndex(null)
+  }, [currentStepIndex])
+
+  if (!step) {
+    return null
+  }
 
   const currentHint =
     hintIndex !== null
-      ? config.hints[hintIndex]
+      ? step.hints[hintIndex]
       : null
 
   const hasMoreHints =
     hintIndex === null ||
     hintIndex <
-    config.hints.length - 1
+    step.hints.length - 1
 
   const handleShowHint = () => {
     if (
-      config.hints.length === 0
+      step.hints.length === 0
     ) {
       return
     }
@@ -42,7 +61,7 @@ export function InvestigationGuide({
 
       return Math.min(
         current + 1,
-        config.hints.length - 1,
+        step.hints.length - 1,
       )
     })
   }
@@ -56,8 +75,6 @@ export function InvestigationGuide({
         shadow-2xl
       "
     >
-      {/* HEADER */}
-
       <header
         className="
           mb-4
@@ -98,7 +115,9 @@ export function InvestigationGuide({
               text-[#6b6151]
             "
           >
-            {config.step} / {config.totalSteps}
+            {currentStepIndex + 1}
+            {' / '}
+            {config.steps.length}
           </span>
         </div>
 
@@ -150,8 +169,6 @@ export function InvestigationGuide({
         </div>
       </header>
 
-      {/* MENSAGEM */}
-
       <p
         className="
           mb-5
@@ -165,10 +182,8 @@ export function InvestigationGuide({
           text-[#4d4539]
         "
       >
-        “{config.message}”
+        “{step.message}”
       </p>
-
-      {/* OBJETIVO */}
 
       <div className="mb-4">
         <p
@@ -190,7 +205,7 @@ export function InvestigationGuide({
             font-bold
           "
         >
-          {config.title}
+          {step.title}
         </h2>
 
         <p
@@ -202,47 +217,47 @@ export function InvestigationGuide({
             text-[#51493d]
           "
         >
-          {config.objective}
+          {step.objective}
         </p>
       </div>
 
-      {/* PRÓXIMO PASSO */}
-
-      <div
-        className="
-          mb-5
-          border
-          border-[#aa9d84]
-          bg-black/[0.03]
-          p-3
-        "
-      >
-        <p
+      {step.suggestedTable && (
+        <div
           className="
-            mb-1
-            font-mono
-            text-[8px]
-            tracking-[0.18em]
-            text-[#786d59]
+            mb-5
+            border
+            border-[#aa9d84]
+            bg-black/[0.03]
+            p-3
           "
         >
-          SUGESTÃO
-        </p>
+          <p
+            className="
+              mb-1
+              font-mono
+              text-[8px]
+              tracking-[0.18em]
+              text-[#786d59]
+            "
+          >
+            SUGESTÃO
+          </p>
 
-        <p
-          className="
-            font-serif
-            text-sm
-          "
-        >
-          Comece pela tabela{' '}
-          <strong>
-            {config.suggestedTable}
-          </strong>.
-        </p>
-      </div>
-
-      {/* HINT */}
+          <p
+            className="
+              font-serif
+              text-sm
+            "
+          >
+            Consulte a tabela{' '}
+            <strong>
+              {
+                step.suggestedTable
+              }
+            </strong>.
+          </p>
+        </div>
+      )}
 
       {currentHint && (
         <div
@@ -264,7 +279,8 @@ export function InvestigationGuide({
               text-[#7b2020]
             "
           >
-            DICA {(hintIndex ?? 0) + 1}
+            DICA{' '}
+            {(hintIndex ?? 0) + 1}
           </p>
 
           <p
@@ -280,7 +296,7 @@ export function InvestigationGuide({
         </div>
       )}
 
-      {config.hints.length > 0 && (
+      {step.hints.length > 0 && (
         <button
           type="button"
           onClick={handleShowHint}

@@ -23,37 +23,202 @@
     "gameplay": {
       "guide": {
         "npcName": "Inspetor Duarte",
-        "step": 1,
-        "totalSteps": 4,
-        "title": "Quem ainda estava no museu?",
-        "message": "Preciso que você descubra quem ainda estava no museu durante o horário do crime.",
-        "objective": "Identifique quem permaneceu no museu depois das 20:30.",
-        "suggestedTable": "visits",
-        "hints": [
-          "A tabela visits registra os horários de entrada e saída das pessoas.",
-          "Observe principalmente a coluna exit_time.",
-          "Tente procurar registros cujo exit_time seja maior ou igual a '20:30'."
-        ]
-      },
-      "sqlPalette": {
-        "keywords": [
-          "SELECT",
-          "FROM",
-          "WHERE"
-        ],
-        "tables": [
-          "visits"
-        ],
-        "columns": [
-          "*",
-          "visits.suspect_id",
-          "visits.exit_time"
-        ],
-        "operators": [
-          ">="
-        ],
-        "values": [
-          "'20:30'"
+        "steps": [
+          {
+            "id": "presence",
+            "title": "Quem permaneceu no museu?",
+            "message": "Primeiro precisamos descobrir quem ainda estava no prédio durante o horário do crime.",
+            "objective": "Identifique as pessoas que permaneceram no museu depois das 20:30.",
+            "suggestedTable": "visits",
+            "requiredTables": [
+              "visits"
+            ],
+            "hints": [
+              "A tabela visits registra os horários de entrada e saída.",
+              "Observe principalmente a coluna exit_time.",
+              "Tente filtrar exit_time por horários maiores ou iguais a '20:30'."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits"
+              ],
+              "columns": [
+                "*",
+                "visits.suspect_id",
+                "visits.entry_time",
+                "visits.exit_time"
+              ],
+              "operators": [
+                ">="
+              ],
+              "values": [
+                "'20:30'"
+              ]
+            }
+          },
+          {
+            "id": "access",
+            "title": "Quem acessou a Sala Bellmont?",
+            "message": "Algumas pessoas ainda estavam no museu. Agora precisamos descobrir quem teve acesso à sala do quadro.",
+            "objective": "Investigue os registros de acesso relacionados à Sala Bellmont.",
+            "suggestedTable": "access_logs",
+            "requiredTables": [
+              "access_logs"
+            ],
+            "hints": [
+              "A tabela rooms pode ajudar a identificar o id da Sala Bellmont.",
+              "Depois consulte access_logs procurando registros dessa sala.",
+              "A Sala Bellmont possui o id 4."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits",
+                "rooms",
+                "access_logs"
+              ],
+              "columns": [
+                "*",
+                "rooms.id",
+                "rooms.name",
+                "access_logs.suspect_id",
+                "access_logs.room_id",
+                "access_logs.time"
+              ],
+              "operators": [
+                "=",
+                ">=",
+                "<="
+              ],
+              "values": [
+                "4",
+                "'Sala Bellmont'",
+                "'20:30'",
+                "'20:50'"
+              ]
+            }
+          },
+          {
+            "id": "contradiction",
+            "title": "Os registros contam a mesma história?",
+            "message": "Temos pessoas próximas à sala. Agora compare as câmeras com os depoimentos e procure contradições.",
+            "objective": "Consulte os registros das câmeras e os depoimentos dos suspeitos.",
+            "suggestedTable": "camera_logs",
+            "requiredTables": [
+              "camera_logs",
+              "interviews"
+            ],
+            "hints": [
+              "camera_logs mostra quem foi registrado próximo às salas.",
+              "interviews contém o que cada suspeito afirmou.",
+              "Compare suspect_id entre os registros e procure alguém cujo depoimento contradiga os dados."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits",
+                "rooms",
+                "access_logs",
+                "camera_logs",
+                "interviews",
+                "suspects"
+              ],
+              "columns": [
+                "*",
+                "suspects.id",
+                "suspects.name",
+                "camera_logs.suspect_id",
+                "camera_logs.room_id",
+                "camera_logs.time",
+                "camera_logs.event",
+                "interviews.suspect_id",
+                "interviews.statement"
+              ],
+              "operators": [
+                "=",
+                ">=",
+                "<="
+              ],
+              "values": [
+                "1",
+                "2",
+                "3",
+                "5",
+                "4",
+                "'20:30'",
+                "'20:50'"
+              ]
+            }
+          },
+          {
+            "id": "accusation",
+            "title": "Hora de apresentar sua conclusão",
+            "message": "Você já consultou os principais registros da investigação. Analise tudo o que encontrou antes de fazer sua acusação.",
+            "objective": "Escolha quem você considera responsável pelo desaparecimento da obra.",
+            "requiredTables": [],
+            "hints": [
+              "Compare o depoimento de cada suspeito com os registros objetivos.",
+              "Uma contradição entre depoimento, acesso e câmera pode ser decisiva."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits",
+                "rooms",
+                "access_logs",
+                "camera_logs",
+                "interviews",
+                "suspects"
+              ],
+              "columns": [
+                "*",
+                "suspects.id",
+                "suspects.name",
+                "suspects.occupation",
+                "visits.suspect_id",
+                "visits.exit_time",
+                "access_logs.suspect_id",
+                "access_logs.room_id",
+                "access_logs.time",
+                "camera_logs.suspect_id",
+                "camera_logs.time",
+                "camera_logs.event",
+                "interviews.suspect_id",
+                "interviews.statement"
+              ],
+              "operators": [
+                "=",
+                ">=",
+                "<="
+              ],
+              "values": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "'20:30'",
+                "'20:50'"
+              ]
+            }
+          }
         ]
       }
     }

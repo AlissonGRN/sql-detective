@@ -1,4 +1,5 @@
 import {
+  useMemo,
   useState,
 } from 'react'
 
@@ -7,16 +8,25 @@ import {
   useParams,
 } from 'react-router'
 
+import type {
+  GameCase,
+} from '../../cases/types/case'
+
 import {
   getCaseById,
 } from '../../cases/services/caseService'
 
+import { AccusationResultModal } from '../components/AccusationResultModal'
 import { DatabaseExplorer } from '../components/DatabaseExplorer'
 import { GameHeader } from '../components/GameHeader'
 import { InvestigationGuide } from '../components/InvestigationGuide'
 import { QueryResults } from '../components/QueryResults'
 import { SqlBuilder } from '../components/SqlBuilder/SqlBuilder'
 import { SuspectModal } from '../components/SuspectModal'
+
+import {
+  useInvestigationProgress,
+} from '../hooks/useInvestigationProgress'
 
 import {
   useScenarioDatabase,
@@ -27,12 +37,32 @@ import {
 } from '../services/sqlEngine'
 
 import {
+  getFriendlySqlError,
+} from '../services/sqlErrorService'
+
+import {
   getInitialScenarioForCase,
 } from '../services/scenarioService'
+
+import {
+  getSolutionByScenarioId,
+} from '../services/solutionService'
+
+import type {
+  GameScenario,
+} from '../types/database'
 
 import type {
   SqlQueryResult,
 } from '../types/query'
+
+interface AccusationResult {
+  correct: boolean
+
+  suspectName: string
+
+  explanation?: string
+}
 
 export function GameplayPage() {
   const {
@@ -40,30 +70,6 @@ export function GameplayPage() {
   } = useParams<{
     caseId: string
   }>()
-
-  const [
-    queryResult,
-    setQueryResult,
-  ] = useState<SqlQueryResult | null>(
-    null,
-  )
-
-  const [
-    queryError,
-    setQueryError,
-  ] = useState<string | null>(
-    null,
-  )
-
-  const [
-    isSuspectModalOpen,
-    setIsSuspectModalOpen,
-  ] = useState(false)
-
-  const [
-    selectedCulpritId,
-    setSelectedCulpritId,
-  ] = useState<number | null>(null)
 
   if (!caseId) {
     return (
@@ -91,18 +97,97 @@ export function GameplayPage() {
     )
   }
 
+  return (
+    <GameplayContent
+      gameCase={gameCase}
+      scenario={scenario}
+    />
+  )
+}
+
+interface GameplayContentProps {
+  gameCase: GameCase
+  scenario: GameScenario
+}
+
+function GameplayContent({
+  gameCase,
+  scenario,
+}: GameplayContentProps) {
+  const [
+    queryResult,
+    setQueryResult,
+  ] = useState<SqlQueryResult | null>(
+    null,
+  )
+
+  const [
+    queryError,
+    setQueryError,
+  ] = useState<string | null>(
+    null,
+  )
+
+  const [
+    isSuspectModalOpen,
+    setIsSuspectModalOpen,
+  ] = useState(false)
+
+  const [
+    selectedCulpritId,
+    setSelectedCulpritId,
+  ] = useState<number | null>(
+    null,
+  )
+
+  const [
+    accusationResult,
+    setAccusationResult,
+  ] =
+    useState<AccusationResult | null>(
+      null,
+    )
+
   const {
     database,
-    isLoading: isDatabaseLoading,
+    isLoading:
+    isDatabaseLoading,
     error: databaseError,
   } = useScenarioDatabase(
     scenario,
   )
 
+  const tableNames =
+    useMemo(
+      () =>
+        scenario.tables.map(
+          (table) =>
+            table.name,
+        ),
+      [scenario.tables],
+    )
+
+  const {
+    currentStep,
+    currentStepIndex,
+
+    registerSuccessfulQuery,
+  } =
+    useInvestigationProgress({
+      scenarioId:
+        scenario.id,
+
+      guide:
+        gameCase.gameplay.guide,
+
+      tableNames,
+    })
+
   const suspectsTable =
     scenario.tables.find(
       (table) =>
-        table.name === 'suspects',
+        table.name ===
+        'suspects',
     )
 
   const handleExecuteQuery = (
@@ -127,13 +212,69 @@ export function GameplayPage() {
         )
 
       setQueryResult(result)
+
+      registerSuccessfulQuery(
+        query,
+      )
     } catch (error: unknown) {
       setQueryError(
-        error instanceof Error
-          ? error.message
-          : 'Não foi possível executar a consulta.',
+        getFriendlySqlError(
+          error,
+        ),
       )
     }
+  }
+
+  const handleAccuse = (
+    suspectId: number,
+  ) => {
+    setSelectedCulpritId(
+      suspectId,
+    )
+
+    const solution =
+      getSolutionByScenarioId(
+        scenario.id,
+      )
+
+    if (
+      !solution ||
+      !suspectsTable
+    ) {
+      return
+    }
+
+    const suspect =
+      suspectsTable.rows.find(
+        (row) =>
+          Number(row.id) ===
+          suspectId,
+      )
+
+    const suspectName =
+      String(
+        suspect?.name ??
+        'Suspeito',
+      )
+
+    const correct =
+      suspectId ===
+      solution.culpritId
+
+    setAccusationResult({
+      correct,
+
+      suspectName,
+
+      explanation:
+        correct
+          ? solution.explanation
+          : undefined,
+    })
+  }
+
+  if (!currentStep) {
+    return null
   }
 
   return (
@@ -178,23 +319,29 @@ export function GameplayPage() {
         >
           <DatabaseExplorer
             databaseName="bell_db"
-            tables={scenario.tables}
+            tables={
+              scenario.tables
+            }
             suggestedTable={
-              gameCase.gameplay.guide
+              currentStep
                 .suggestedTable
             }
           />
 
           <div className="space-y-8">
             <SqlBuilder
-              tables={scenario.tables}
+              tables={
+                scenario.tables
+              }
               paletteConfig={
-                gameCase.gameplay
+                currentStep
                   .sqlPalette
               }
               disabled={
                 isDatabaseLoading ||
-                Boolean(databaseError)
+                Boolean(
+                  databaseError,
+                )
               }
               onExecute={
                 handleExecuteQuery
@@ -202,7 +349,9 @@ export function GameplayPage() {
             />
 
             <QueryResults
-              result={queryResult}
+              result={
+                queryResult
+              }
               error={
                 queryError ??
                 databaseError
@@ -221,7 +370,12 @@ export function GameplayPage() {
           >
             <InvestigationGuide
               config={
-                gameCase.gameplay.guide
+                gameCase
+                  .gameplay
+                  .guide
+              }
+              currentStepIndex={
+                currentStepIndex
               }
             />
           </div>
@@ -243,10 +397,31 @@ export function GameplayPage() {
               )
             }
             onConfirm={
-              setSelectedCulpritId
+              handleAccuse
             }
           />
         )}
+
+      {accusationResult && (
+        <AccusationResultModal
+          correct={
+            accusationResult.correct
+          }
+          suspectName={
+            accusationResult
+              .suspectName
+          }
+          explanation={
+            accusationResult
+              .explanation
+          }
+          onClose={() =>
+            setAccusationResult(
+              null,
+            )
+          }
+        />
+      )}
     </main>
   )
 }
