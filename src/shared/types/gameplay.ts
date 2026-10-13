@@ -20,6 +20,12 @@ export interface InvestigationStepConfig {
   hints: string[]
 
   sqlPalette: SqlPaletteConfig
+
+  validation?: {
+    column: string
+    expectedValues: Array<string | number>
+    requireWhere?: boolean
+  }
 }
 
 export interface InvestigationGuideConfig {
