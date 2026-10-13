@@ -5,12 +5,18 @@ interface GameHeaderProps {
   caseTitle: string
 
   onAnalyzeSuspects: () => void
+  canAccuse: boolean
+  completedSteps: number
+  totalSteps: number
 }
 
 export function GameHeader({
   caseNumber,
   caseTitle,
   onAnalyzeSuspects,
+  canAccuse,
+  completedSteps,
+  totalSteps,
 }: GameHeaderProps) {
   return (
     <header
@@ -61,6 +67,8 @@ export function GameHeader({
       <button
         type="button"
         onClick={onAnalyzeSuspects}
+        disabled={!canAccuse}
+        title={canAccuse ? "Apresentar acusação" : "Conclua as etapas investigativas para acusar"}
         className="
           flex
           items-center
@@ -76,6 +84,8 @@ export function GameHeader({
           transition
 
           hover:bg-[#d1b276]
+          disabled:cursor-not-allowed
+          disabled:opacity-40
         "
       >
         <svg
@@ -96,7 +106,7 @@ export function GameHeader({
           />
         </svg>
 
-        ANALISAR SUSPEITOS
+        {canAccuse ? 'ANALISAR SUSPEITOS' : `INVESTIGANDO ${completedSteps}/${totalSteps}`}
       </button>
     </header>
   )

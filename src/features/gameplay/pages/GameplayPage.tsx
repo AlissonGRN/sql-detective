@@ -180,6 +180,8 @@ function GameplayContent({
       tableNames,
     })
 
+  const canAccuse = currentStep?.id === 'accusation'
+
   const suspectsTable =
     scenario.tables.find(
       (table) =>
@@ -230,6 +232,7 @@ function GameplayContent({
   const handleAccuse = (
     suspectId: number,
   ) => {
+    if (!canAccuse) return
     setSelectedCulpritId(
       suspectId,
     )
@@ -305,11 +308,12 @@ function GameplayContent({
           caseTitle={
             gameCase.title
           }
-          onAnalyzeSuspects={() =>
-            setIsSuspectModalOpen(
-              true,
-            )
-          }
+          canAccuse={canAccuse}
+          completedSteps={currentStepIndex}
+          totalSteps={Math.max(gameCase.gameplay.guide.steps.length - 1, 0)}
+          onAnalyzeSuspects={() => {
+            if (canAccuse) setIsSuspectModalOpen(true)
+          }}
         />
 
         <section
@@ -391,6 +395,7 @@ function GameplayContent({
       </div>
 
       {isSuspectModalOpen &&
+        canAccuse &&
         suspectsTable && (
           <SuspectModal
             suspects={
