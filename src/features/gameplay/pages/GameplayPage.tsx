@@ -1,10 +1,10 @@
 import {
-  useMemo,
   useState,
 } from 'react'
 
 import {
   Navigate,
+  useNavigate,
   useParams,
 } from 'react-router'
 
@@ -35,6 +35,8 @@ import {
 import {
   executeSelectQuery,
 } from '../services/sqlEngine'
+
+import { evaluateInvestigationQuery } from '../services/investigationValidation'
 
 import {
   getFriendlySqlError,
@@ -114,6 +116,9 @@ function GameplayContent({
   gameCase,
   scenario,
 }: GameplayContentProps) {
+  const navigate = useNavigate()
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const [caseCompleted, setCaseCompleted] = useState(false)
   const [
     queryResult,
     setQueryResult,
@@ -158,13 +163,12 @@ function GameplayContent({
   )
 
   const tableNames =
-    useMemo(
+    (
       () =>
         scenario.tables.map(
           (table) =>
             table.name,
         ),
-      [scenario.tables],
     )
 
   const {
@@ -195,6 +199,7 @@ function GameplayContent({
   ) => {
     setQueryError(null)
     setQueryResult(null)
+    setFeedback(null)
 
     if (!database) {
       setQueryError(
@@ -213,9 +218,13 @@ function GameplayContent({
 
       setQueryResult(result)
 
-      registerSuccessfulQuery(
-        query,
-      )
+      if (currentStep.id !== 'accusation') {
+        const evaluation = evaluateInvestigationQuery(currentStep, query, result)
+        setFeedback(evaluation.message)
+        if (evaluation.success && evaluation.consultedTable) {
+          registerSuccessfulQuery(evaluation.consultedTable)
+        }
+      }
     } catch (error: unknown) {
       setQueryError(
         getFriendlySqlError(
@@ -260,6 +269,8 @@ function GameplayContent({
     const correct =
       suspectId ===
       solution.culpritId
+
+    if (correct) setCaseCompleted(true)
 
     setAccusationResult({
       correct,
@@ -348,6 +359,10 @@ function GameplayContent({
               }
             />
 
+            {feedback && (
+              <p role="status" className="border-l-2 border-[#b79762] bg-[#282824] px-4 py-3 font-mono text-xs text-[#e6dfcc]">{feedback}</p>
+            )}
+
             <QueryResults
               result={
                 queryResult
@@ -415,11 +430,10 @@ function GameplayContent({
             accusationResult
               .explanation
           }
-          onClose={() =>
-            setAccusationResult(
-              null,
-            )
-          }
+          onClose={() => {
+            setAccusationResult(null)
+            if (caseCompleted) navigate('/cases')
+          }}
         />
       )}
     </main>
