@@ -1,0 +1,343 @@
+{
+  "id": "scenario-02",
+  "caseId": "case-002",
+  "isDefault": true,
+  "tables": [
+    {
+      "name": "suspects",
+      "description": "Funcionários e visitantes do Centro Atlas.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "occupation",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Marina Rocha",
+          "occupation": "Diretora de pesquisa"
+        },
+        {
+          "id": 2,
+          "name": "Daniel Freitas",
+          "occupation": "Engenheiro de robótica"
+        },
+        {
+          "id": 3,
+          "name": "Paula Nogueira",
+          "occupation": "Recepcionista"
+        },
+        {
+          "id": 4,
+          "name": "Renata Martins",
+          "occupation": "Técnica de laboratório"
+        },
+        {
+          "id": 5,
+          "name": "Gustavo Pires",
+          "occupation": "Investidor visitante"
+        },
+        {
+          "id": 6,
+          "name": "Sérgio Lima",
+          "occupation": "Responsável pela limpeza"
+        }
+      ]
+    },
+    {
+      "name": "rooms",
+      "description": "Ambientes do centro de pesquisa.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "floor",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Recepção",
+          "floor": 0
+        },
+        {
+          "id": 2,
+          "name": "Laboratório Principal",
+          "floor": 1
+        },
+        {
+          "id": 3,
+          "name": "Depósito de Protótipos",
+          "floor": 1
+        },
+        {
+          "id": 4,
+          "name": "Sala de Reuniões",
+          "floor": 2
+        }
+      ]
+    },
+    {
+      "name": "visits",
+      "description": "Registros de entrada e saída do prédio.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "entry_time",
+          "type": "TEXT"
+        },
+        {
+          "name": "exit_time",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 1,
+          "entry_time": "08:05",
+          "exit_time": "20:15"
+        },
+        {
+          "id": 2,
+          "suspect_id": 2,
+          "entry_time": "09:00",
+          "exit_time": "19:40"
+        },
+        {
+          "id": 3,
+          "suspect_id": 3,
+          "entry_time": "08:40",
+          "exit_time": "18:10"
+        },
+        {
+          "id": 4,
+          "suspect_id": 4,
+          "entry_time": "10:25",
+          "exit_time": "21:05"
+        },
+        {
+          "id": 5,
+          "suspect_id": 5,
+          "entry_time": "17:30",
+          "exit_time": "19:22"
+        },
+        {
+          "id": 6,
+          "suspect_id": 6,
+          "entry_time": "15:00",
+          "exit_time": "18:45"
+        }
+      ]
+    },
+    {
+      "name": "access_logs",
+      "description": "Entradas em ambientes restritos por crachá.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "room_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "time",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 1,
+          "room_id": 4,
+          "time": "19:05"
+        },
+        {
+          "id": 2,
+          "suspect_id": 2,
+          "room_id": 3,
+          "time": "19:12"
+        },
+        {
+          "id": 3,
+          "suspect_id": 4,
+          "room_id": 3,
+          "time": "19:18"
+        },
+        {
+          "id": 4,
+          "suspect_id": 5,
+          "room_id": 1,
+          "time": "19:04"
+        },
+        {
+          "id": 5,
+          "suspect_id": 2,
+          "room_id": 2,
+          "time": "19:21"
+        },
+        {
+          "id": 6,
+          "suspect_id": 4,
+          "room_id": 2,
+          "time": "18:05"
+        },
+        {
+          "id": 7,
+          "suspect_id": 3,
+          "room_id": 1,
+          "time": "17:30"
+        }
+      ]
+    },
+    {
+      "name": "camera_logs",
+      "description": "Eventos registrados pelas câmeras do Centro Atlas.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "room_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "time",
+          "type": "TEXT"
+        },
+        {
+          "name": "event",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 2,
+          "room_id": 3,
+          "time": "19:15",
+          "event": "Saiu do depósito sem carregar objetos"
+        },
+        {
+          "id": 2,
+          "suspect_id": 4,
+          "room_id": 3,
+          "time": "19:20",
+          "event": "Entrou no corredor de armazenamento"
+        },
+        {
+          "id": 3,
+          "suspect_id": 2,
+          "room_id": 2,
+          "time": "19:23",
+          "event": "Retornou ao laboratório principal"
+        },
+        {
+          "id": 4,
+          "suspect_id": 4,
+          "room_id": 3,
+          "time": "19:48",
+          "event": "Saiu do corredor com uma caixa de equipamentos"
+        },
+        {
+          "id": 5,
+          "suspect_id": 5,
+          "room_id": 1,
+          "time": "19:16",
+          "event": "Aguardava transporte na recepção"
+        },
+        {
+          "id": 6,
+          "suspect_id": 1,
+          "room_id": 4,
+          "time": "19:31",
+          "event": "Permaneceu na sala de reuniões"
+        }
+      ]
+    },
+    {
+      "name": "interviews",
+      "description": "Declarações prestadas à equipe de investigação.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "statement",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 1,
+          "statement": "Estive na reunião com os investidores até depois das sete e meia."
+        },
+        {
+          "id": 2,
+          "suspect_id": 2,
+          "statement": "Entrei no depósito para conferir o protótipo, mas saí sem levar nada."
+        },
+        {
+          "id": 3,
+          "suspect_id": 3,
+          "statement": "Terminei meu expediente antes das sete."
+        },
+        {
+          "id": 4,
+          "suspect_id": 4,
+          "statement": "Não entrei no depósito depois das sete; fiquei organizando o laboratório."
+        },
+        {
+          "id": 5,
+          "suspect_id": 5,
+          "statement": "Esperei na recepção até meu transporte chegar."
+        },
+        {
+          "id": 6,
+          "suspect_id": 6,
+          "statement": "Saí antes do encerramento do laboratório."
+        }
+      ]
+    }
+  ]
+}
