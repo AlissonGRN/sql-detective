@@ -162,14 +162,7 @@ function GameplayContent({
     scenario,
   )
 
-  const tableNames =
-    (
-      () =>
-        scenario.tables.map(
-          (table) =>
-            table.name,
-        ),
-    )
+  const tableNames = scenario.tables.map((table) => table.name)
 
   const {
     currentStep,
