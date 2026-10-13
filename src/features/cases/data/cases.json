@@ -244,5 +244,232 @@
         ]
       }
     }
+  },
+  {
+    "id": "case-002",
+    "number": "CASO #002",
+    "title": "O Protótipo Desaparecido",
+    "difficulty": "Básico",
+    "description": "Um robô experimental desapareceu de um depósito restrito no Centro Atlas.",
+    "concepts": [
+      "SELECT",
+      "FROM",
+      "WHERE",
+      "AND"
+    ],
+    "available": true,
+    "briefing": {
+      "npcName": "Inspetor Duarte",
+      "npcRole": "Chefe da Divisão de Crimes Especiais",
+      "location": "Centro Atlas",
+      "crime": "Desaparecimento de protótipo tecnológico",
+      "time": "19:00 — 20:00",
+      "speech": "O protótipo de robótica do Centro Atlas desapareceu do depósito na noite anterior à sua apresentação. O acesso é restrito, mas vários funcionários e visitantes estavam no prédio. Verifique os registros e descubra quem retirou o equipamento.",
+      "mission": "Investigue horários, acessos, câmeras e depoimentos por meio de SQL para identificar o responsável."
+    },
+    "gameplay": {
+      "guide": {
+        "npcName": "Inspetor Duarte",
+        "steps": [
+          {
+            "id": "presence",
+            "title": "Quem ficou após o fechamento?",
+            "message": "O protótipo desapareceu entre 19:00 e 20:00. Descubra quem ainda estava no Centro Atlas após as 19:00.",
+            "objective": "Encontre os IDs de quem saiu a partir das 19:00.",
+            "suggestedTable": "visits",
+            "requiredTables": [
+              "visits"
+            ],
+            "hints": [
+              "Comece pela coluna exit_time.",
+              "Use WHERE para filtrar os horários.",
+              "Procure saídas maiores ou iguais a '19:00'."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits"
+              ],
+              "columns": [
+                "*",
+                "visits.suspect_id",
+                "visits.exit_time"
+              ],
+              "operators": [
+                ">="
+              ],
+              "values": [
+                "'19:00'"
+              ]
+            },
+            "validation": {
+              "column": "suspect_id",
+              "expectedValues": [
+                1,
+                2,
+                4,
+                5
+              ],
+              "requireWhere": true
+            }
+          },
+          {
+            "id": "access",
+            "title": "Quem entrou no depósito?",
+            "message": "Agora precisamos saber quem utilizou o crachá no Depósito de Protótipos após as 19:00.",
+            "objective": "Identifique os crachás que abriram a sala restrita no horário do crime.",
+            "suggestedTable": "access_logs",
+            "requiredTables": [
+              "access_logs"
+            ],
+            "hints": [
+              "Consulte rooms para descobrir o identificador do Depósito de Protótipos.",
+              "O depósito possui room_id = 3.",
+              "Combine room_id = 3 com time >= '19:00' usando AND."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE",
+                "AND"
+              ],
+              "tables": [
+                "rooms",
+                "access_logs",
+                "visits"
+              ],
+              "columns": [
+                "*",
+                "rooms.id",
+                "rooms.name",
+                "access_logs.suspect_id",
+                "access_logs.room_id",
+                "access_logs.time"
+              ],
+              "operators": [
+                "=",
+                ">="
+              ],
+              "values": [
+                "3",
+                "'19:00'"
+              ]
+            },
+            "validation": {
+              "column": "suspect_id",
+              "expectedValues": [
+                2,
+                4
+              ],
+              "requireWhere": true
+            }
+          },
+          {
+            "id": "contradiction",
+            "title": "Quem está mentindo?",
+            "message": "Dois crachás abriram o depósito. Compare os movimentos gravados com os depoimentos e identifique as contradições.",
+            "objective": "Consulte câmeras e entrevistas para identificar quem mentiu sobre sua presença no depósito.",
+            "suggestedTable": "camera_logs",
+            "requiredTables": [
+              "camera_logs",
+              "interviews"
+            ],
+            "hints": [
+              "Comece consultando camera_logs.",
+              "Depois leia interviews.",
+              "Uma pessoa nega ter entrado no depósito, mas os registros contam outra história."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits",
+                "rooms",
+                "access_logs",
+                "camera_logs",
+                "interviews",
+                "suspects"
+              ],
+              "columns": [
+                "*",
+                "camera_logs.suspect_id",
+                "camera_logs.time",
+                "camera_logs.event",
+                "interviews.suspect_id",
+                "interviews.statement",
+                "suspects.id",
+                "suspects.name"
+              ],
+              "operators": [
+                "="
+              ],
+              "values": [
+                "2",
+                "4"
+              ]
+            }
+          },
+          {
+            "id": "accusation",
+            "title": "Apresente sua conclusão",
+            "message": "Os registros já permitem uma conclusão. Analise quem mentiu e formalize a acusação.",
+            "objective": "Abra Analisar Suspeitos e escolha o responsável pelo desaparecimento.",
+            "requiredTables": [],
+            "hints": [
+              "Compare a declaração de Daniel com a de Renata.",
+              "Observe quem saiu do depósito carregando uma caixa."
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "visits",
+                "rooms",
+                "access_logs",
+                "camera_logs",
+                "interviews",
+                "suspects"
+              ],
+              "columns": [
+                "*",
+                "suspects.id",
+                "suspects.name",
+                "visits.suspect_id",
+                "visits.exit_time",
+                "access_logs.suspect_id",
+                "access_logs.room_id",
+                "access_logs.time",
+                "camera_logs.suspect_id",
+                "camera_logs.time",
+                "camera_logs.event",
+                "interviews.suspect_id",
+                "interviews.statement"
+              ],
+              "operators": [
+                "=",
+                ">="
+              ],
+              "values": [
+                "2",
+                "3",
+                "4",
+                "'19:00'"
+              ]
+            }
+          }
+        ]
+      }
+    }
   }
 ]
