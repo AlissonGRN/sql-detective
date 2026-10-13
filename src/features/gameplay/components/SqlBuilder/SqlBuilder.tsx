@@ -106,6 +106,12 @@ export function SqlBuilder({
         </span>
       </header>
 
+      <div className="mb-5 border-l-2 border-[#c5a56e] bg-[#181714] px-4 py-3 text-xs leading-6 text-[#d9ccb0]">
+        <strong className="block font-mono text-[10px] text-[#c5a56e]">1 · MONTE A CONSULTA CLICANDO NOS BLOCOS</strong>
+        Para começar: <code className="font-mono text-[#f0e6d0]">SELECT → * → FROM → tabela</code>.
+        Depois adicione <code className="font-mono">WHERE</code> para filtrar. Clique em um bloco montado para removê-lo.
+      </div>
+
       {/* QUERY */}
 
       <section
@@ -266,7 +272,7 @@ export function SqlBuilder({
             disabled:opacity-30
           "
         >
-          EXECUTAR CONSULTA →
+          2 · EXECUTAR CONSULTA →
         </button>
       </footer>
     </article>
