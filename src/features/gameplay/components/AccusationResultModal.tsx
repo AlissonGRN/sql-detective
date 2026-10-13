@@ -117,7 +117,7 @@ export function AccusationResultModal({
             "
           >
             {correct
-              ? 'FECHAR CASO'
+              ? 'VOLTAR AOS CASOS'
               : 'VOLTAR À INVESTIGAÇÃO'}
           </button>
         </div>
