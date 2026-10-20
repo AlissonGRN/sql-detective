@@ -33,11 +33,6 @@
             "requiredTables": [
               "visits"
             ],
-            "hints": [
-              "A tabela visits registra os horários de entrada e saída.",
-              "Observe principalmente a coluna exit_time.",
-              "Tente filtrar exit_time por horários maiores ou iguais a '20:30'."
-            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -79,11 +74,6 @@
             "suggestedTable": "access_logs",
             "requiredTables": [
               "access_logs"
-            ],
-            "hints": [
-              "A tabela rooms pode ajudar a identificar o id da Sala Bellmont.",
-              "Depois consulte access_logs procurando registros dessa sala.",
-              "A Sala Bellmont possui o id 4."
             ],
             "sqlPalette": {
               "keywords": [
@@ -137,11 +127,6 @@
               "camera_logs",
               "interviews"
             ],
-            "hints": [
-              "camera_logs mostra quem foi registrado próximo às salas.",
-              "interviews contém o que cada suspeito afirmou.",
-              "Compare suspect_id entre os registros e procure alguém cujo depoimento contradiga os dados."
-            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -191,10 +176,6 @@
             "message": "Você já consultou os principais registros da investigação. Analise tudo o que encontrou antes de fazer sua acusação.",
             "objective": "Escolha quem você considera responsável pelo desaparecimento da obra.",
             "requiredTables": [],
-            "hints": [
-              "Compare o depoimento de cada suspeito com os registros objetivos.",
-              "Uma contradição entre depoimento, acesso e câmera pode ser decisiva."
-            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -280,11 +261,6 @@
             "requiredTables": [
               "visits"
             ],
-            "hints": [
-              "Comece pela coluna exit_time.",
-              "Use WHERE para filtrar os horários.",
-              "Procure saídas maiores ou iguais a '19:00'."
-            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -325,11 +301,6 @@
             "suggestedTable": "access_logs",
             "requiredTables": [
               "access_logs"
-            ],
-            "hints": [
-              "Consulte rooms para descobrir o identificador do Depósito de Protótipos.",
-              "O depósito possui room_id = 3.",
-              "Combine room_id = 3 com time >= '19:00' usando AND."
             ],
             "sqlPalette": {
               "keywords": [
@@ -379,11 +350,6 @@
               "camera_logs",
               "interviews"
             ],
-            "hints": [
-              "Comece consultando camera_logs.",
-              "Depois leia interviews.",
-              "Uma pessoa nega ter entrado no depósito, mas os registros contam outra história."
-            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -423,10 +389,6 @@
             "message": "Os registros já permitem uma conclusão. Analise quem mentiu e formalize a acusação.",
             "objective": "Abra Analisar Suspeitos e escolha o responsável pelo desaparecimento.",
             "requiredTables": [],
-            "hints": [
-              "Compare a declaração de Daniel com a de Renata.",
-              "Observe quem saiu do depósito carregando uma caixa."
-            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -465,6 +427,209 @@
                 "3",
                 "4",
                 "'19:00'"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "case-003",
+    "number": "CASO #003",
+    "title": "A fraude no leilão",
+    "difficulty": "Intermediário",
+    "description": "Uma venda suspeita no leilão do Museu Bellmont esconde uma fraude nos pagamentos.",
+    "concepts": [
+      "SELECT e WHERE",
+      "JOIN",
+      "Relacionamento entre tabelas",
+      "Análise de evidências"
+    ],
+    "available": true,
+    "briefing": {
+      "npcName": "Inspetor Duarte",
+      "npcRole": "Chefe da Divisão de Crimes Especiais",
+      "location": "Casa de Leilões Bellmont",
+      "crime": "Fraude em leilão e pagamento suspeito",
+      "time": "18:00 — 19:30",
+      "speech": "Uma obra foi arrematada por um valor alto, mas o pagamento foi rejeitado e os dados do pagador não correspondem ao lance. Precisamos descobrir quem participou da fraude. Os registros estão separados em tabelas relacionadas: conecte as informações antes de tirar conclusões.",
+      "mission": "Investigue as obras, os lances e os pagamentos. Use JOIN para relacionar tabelas e identifique quem fez o lance ligado ao pagamento suspeito."
+    },
+    "gameplay": {
+      "guide": {
+        "npcName": "Inspetor Duarte",
+        "steps": [
+          {
+            "id": "artworks",
+            "title": "Quais obras estavam no leilão?",
+            "message": "Comece conhecendo as obras e os valores de reserva registrados.",
+            "objective": "Consulte os registros de obras para saber quais itens foram leiloados.",
+            "suggestedTable": "artworks",
+            "requiredTables": [
+              "artworks"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM"
+              ],
+              "tables": [
+                "artworks"
+              ],
+              "columns": [
+                "*",
+                "artworks.id",
+                "artworks.title",
+                "artworks.reserve_price"
+              ],
+              "operators": [
+                ">=",
+                "="
+              ],
+              "values": [
+                "3000",
+                "5000"
+              ]
+            }
+          },
+          {
+            "id": "bids",
+            "title": "Quais lances merecem atenção?",
+            "message": "Compare os valores dos lances com os valores de reserva das obras.",
+            "objective": "Encontre os lances de valor alto e observe os identificadores dos participantes.",
+            "suggestedTable": "bids",
+            "requiredTables": [
+              "bids"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "bids"
+              ],
+              "columns": [
+                "*",
+                "bids.id",
+                "bids.suspect_id",
+                "bids.artwork_id",
+                "bids.amount"
+              ],
+              "operators": [
+                ">=",
+                "="
+              ],
+              "values": [
+                "5000",
+                "6000"
+              ]
+            },
+            "validation": {
+              "column": "suspect_id",
+              "expectedValues": [
+                2,
+                3
+              ],
+              "requireWhere": true
+            }
+          },
+          {
+            "id": "payments",
+            "title": "Quem está ligado ao pagamento rejeitado?",
+            "message": "Um lance alto está ligado a um pagamento rejeitado. Relacione as tabelas para encontrar quem fez o lance e compare com os dados do pagador.",
+            "objective": "Use JOIN entre bids e payments para localizar o lance com pagamento rejeitado. Você também pode relacionar suspects para identificar a pessoa.",
+            "suggestedTable": "payments",
+            "requiredTables": [
+              "bids",
+              "payments"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "JOIN",
+                "ON",
+                "WHERE",
+                "AND"
+              ],
+              "tables": [
+                "bids",
+                "payments",
+                "suspects",
+                "artworks"
+              ],
+              "columns": [
+                "*",
+                "bids.id",
+                "bids.suspect_id",
+                "bids.artwork_id",
+                "bids.amount",
+                "payments.bid_id",
+                "payments.payer_id",
+                "payments.amount",
+                "payments.status",
+                "suspects.id",
+                "suspects.name"
+              ],
+              "operators": [
+                "=",
+                "!=",
+                "<>",
+                ">="
+              ],
+              "values": [
+                "3",
+                "'REJECTED'",
+                "'CONFIRMED'",
+                "5000"
+              ]
+            },
+            "validation": {
+              "column": "suspect_id",
+              "expectedValues": [
+                3
+              ],
+              "requireWhere": true
+            }
+          },
+          {
+            "id": "accusation",
+            "title": "Apresente sua conclusão",
+            "message": "Use os registros relacionados para explicar quem fez o lance suspeito e por que o pagamento não confere.",
+            "objective": "Abra Analisar Suspeitos e selecione quem está ligado ao lance fraudulento.",
+            "requiredTables": [],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "JOIN",
+                "ON",
+                "WHERE"
+              ],
+              "tables": [
+                "bids",
+                "payments",
+                "suspects",
+                "artworks"
+              ],
+              "columns": [
+                "*",
+                "bids.suspect_id",
+                "bids.amount",
+                "payments.payer_id",
+                "payments.status",
+                "suspects.name"
+              ],
+              "operators": [
+                "=",
+                "!="
+              ],
+              "values": [
+                "3",
+                "'REJECTED'"
               ]
             }
           }
