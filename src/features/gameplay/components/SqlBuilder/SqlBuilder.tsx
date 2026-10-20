@@ -132,7 +132,7 @@ export function SqlBuilder({
       </header>
 
       <div className="mb-5 border-l-2 border-[#c5a56e] bg-[#181714] px-4 py-3 text-xs leading-6 text-[#d9ccb0]">
-        <strong className="block font-mono text-[10px] text-[#c5a56e]">1 · MONTE A CONSULTA CLICANDO NOS BLOCOS</strong>
+        <strong className="block font-mono text-[10px] text-[#c5a56e]">1 · MONTE A CONSULTA COM OS BLOCOS</strong>
         Arraste os blocos da paleta para esta área e solte-os na ordem desejada. Também é possível clicar nos blocos. Arraste os blocos montados para reorganizar; clique em um bloco para removê-lo.
       </div>
 
