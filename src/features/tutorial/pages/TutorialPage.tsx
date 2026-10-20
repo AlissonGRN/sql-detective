@@ -1,50 +1,13 @@
 import { Link } from 'react-router'
 
+const lessons = [
+  { number: '01', title: 'Entenda a missão', body: 'Cada caso apresenta um crime e um objetivo atual. Leia o objetivo como uma pergunta que os dados precisam responder.' },
+  { number: '02', title: 'Explore o banco', body: 'Abra tabelas para conhecer colunas e registros. Os nomes das colunas indicam quais informações você pode consultar.' },
+  { number: '03', title: 'Monte uma consulta', body: 'SELECT escolhe colunas; FROM indica a tabela; WHERE filtra registros; JOIN combina dados de tabelas relacionadas. Arraste blocos para a área de montagem ou clique neles. Arraste blocos montados para mudar a ordem.' },
+  { number: '04', title: 'Execute e interprete', body: 'Uma consulta sem erro não significa necessariamente que encontrou a evidência certa. Se não houver linhas, revise os filtros e tente outra abordagem.' },
+  { number: '05', title: 'Conecte evidências', body: 'Compare horários, acessos, câmeras e depoimentos. Procure contradições e construa uma explicação baseada em mais de um registro.' },
+  { number: '06', title: 'Apresente a conclusão', body: 'Só acuse quando tiver evidências suficientes. Se escolher a pessoa errada, o caso continua aberto e você pode voltar aos dados.' },
+]
 export function TutorialPage() {
-  return (
-    <main
-      className="
-        min-h-screen
-        bg-[#151512]
-        px-8
-        py-10
-        text-[#e8e1d2]
-      "
-    >
-      <Link
-        to="/"
-        className="
-          font-mono
-          text-xs
-          text-neutral-500
-          transition
-          hover:text-white
-        "
-      >
-        ← MENU PRINCIPAL
-      </Link>
-
-      <div className="mx-auto mt-20 max-w-3xl">
-        <p
-          className="
-            mb-2
-            font-mono
-            text-xs
-            tracking-[0.2em]
-            text-[#9e3030]
-          "
-        >
-          TREINAMENTO
-        </p>
-
-        <h1 className="font-serif text-4xl font-bold">
-          Tutorial
-        </h1>
-
-        <p className="mt-4 text-neutral-500">
-          O tutorial será implementado posteriormente.
-        </p>
-      </div>
-    </main>
-  )
+  return <main className="min-h-screen bg-[#151512] px-5 py-8 text-[#e8e1d2] md:px-8"><div className="mx-auto max-w-4xl"><Link to="/" className="font-mono text-xs text-neutral-500 transition hover:text-white">← MENU PRINCIPAL</Link><header className="mb-12 mt-16"><p className="mb-2 font-mono text-xs tracking-[0.2em] text-[#9e3030]">TREINAMENTO DO INVESTIGADOR</p><h1 className="font-serif text-4xl font-bold md:text-5xl">Manual de investigação</h1><p className="mt-4 max-w-2xl leading-7 text-neutral-400">Aprenda o fluxo de investigação e os blocos SQL antes de abrir um caso. Há várias consultas possíveis; o importante é interpretar as evidências.</p></header><div className="grid gap-4 md:grid-cols-2">{lessons.map((lesson) => <article key={lesson.number} className="border border-[#39372f] bg-[#25241f] p-6"><p className="mb-3 font-mono text-xs text-[#c5a56e]">LIÇÃO {lesson.number}</p><h2 className="mb-3 font-serif text-xl font-bold">{lesson.title}</h2><p className="text-sm leading-6 text-[#c5bdad]">{lesson.body}</p></article>)}</div><div className="mt-8 flex flex-wrap gap-3"><Link to="/cases" className="bg-[#7b2020] px-6 py-3 font-mono text-xs font-bold text-white">ESCOLHER UM CASO →</Link><Link to="/how-to-play" className="border border-[#5b564b] px-6 py-3 font-mono text-xs text-[#c5bdad]">REGRAS DO JOGO</Link></div></div></main>
 }

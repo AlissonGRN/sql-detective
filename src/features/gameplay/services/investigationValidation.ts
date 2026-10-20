@@ -4,73 +4,44 @@ import type { InvestigationStepConfig } from '../../../shared/types/gameplay'
 export interface InvestigationFeedback {
   success: boolean
   message: string
-  consultedTable: string | null
+  consultedTables: string[]
 }
 
-export function evaluateInvestigationQuery(
-  step: InvestigationStepConfig,
-  query: string,
-  result: SqlQueryResult,
-): InvestigationFeedback {
-  const consultedTable =
-    step.requiredTables.find((table) =>
-      new RegExp(`\\b(?:FROM|JOIN)\\s+["\x60\\[]?${escapeRegExp(table)}\\b`, 'i').test(query),
-    ) ?? null
+export function evaluateInvestigationQuery(step: InvestigationStepConfig, query: string, result: SqlQueryResult): InvestigationFeedback {
+  const normalized = query.replace(/[\n\r]+/g, ' ')
+  const tableMatches = [...normalized.matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_]\w*)/gi)]
+  const tableNames = tableMatches.map((match) => match[1].toLowerCase())
+  const consultedTables = step.requiredTables.filter((table) => tableNames.includes(table.toLowerCase()))
 
-  if (!consultedTable) {
-    return {
-      success: false,
-      consultedTable: null,
-      message: 'Consulta executada e mantida como exploração. Ela ainda não confirma o objetivo atual: confira a tabela sugerida pelo Inspetor ou continue investigando por outro caminho.',
-    }
+  if (consultedTables.length === 0) {
+    return { success: false, consultedTables: [], message: 'Consulta executada como exploração. Ela ainda não confirma o objetivo atual. Compare as tabelas disponíveis com a pergunta do Inspetor e tente outro caminho.' }
   }
 
   if (step.validation) {
-    if (step.validation.requireWhere && !/\bWHERE\b/i.test(query)) {
-      return {
-        success: false,
-        consultedTable,
-        message: 'Você encontrou a tabela, mas ainda precisa filtrar os registros com WHERE.',
-      }
+    if (step.validation.requireWhere && !/\bWHERE\b/i.test(normalized)) {
+      return { success: false, consultedTables, message: 'A consulta é válida, mas ainda está ampla demais para este objetivo. Experimente filtrar os registros com WHERE.' }
     }
-
-    const columnIndex = result.columns.findIndex(
-      (column) => column.toLowerCase() === step.validation?.column.toLowerCase(),
-    )
-
+    const expectedColumn = step.validation.column.toLowerCase()
+    const aliasPattern = new RegExp('(?:[a-zA-Z_]\\w*\\.)?' + escapeRegExp(expectedColumn) + '\\s+AS\\s+([a-zA-Z_]\\w*)', 'i')
+    const alias = normalized.match(aliasPattern)?.[1]?.toLowerCase()
+    const outputColumn = alias ?? expectedColumn
+    const columnIndex = result.columns.findIndex((column) => (column.toLowerCase().split('.').pop() ?? column.toLowerCase()) === outputColumn)
     if (columnIndex === -1) {
-      return {
-        success: false,
-        consultedTable,
-        message: `Inclua a coluna "${step.validation.column}" no SELECT para conferir os suspeitos encontrados.`,
-      }
+      return { success: false, consultedTables, message: 'A consulta ainda não mostra a coluna necessária para conferir o resultado. Inclua "' + step.validation.column + '" no SELECT ou use um alias claro.' }
     }
-
     const actual = [...new Set(result.rows.map((row) => String(row[columnIndex])))].sort()
     const expected = [...new Set(step.validation.expectedValues.map(String))].sort()
-
     if (JSON.stringify(actual) !== JSON.stringify(expected)) {
-      return {
-        success: false,
-        consultedTable,
-        message: 'Consulta válida, mas os resultados ainda não correspondem ao objetivo. Revise o filtro e tente novamente.',
-      }
+      return { success: false, consultedTables, message: 'A consulta foi executada, mas o resultado ainda não corresponde ao objetivo. Confira os valores retornados e ajuste os filtros; você pode usar JOIN ou outra consulta equivalente.' }
     }
   } else if (result.rows.length === 0) {
-    return {
-      success: false,
-      consultedTable,
-      message: 'A consulta é válida, mas não retornou registros. Revise os filtros ou teste outra consulta; explorar faz parte da investigação.',
-    }
+    return { success: false, consultedTables, message: 'Consulta válida, mas sem registros. Revise os filtros ou experimente outra tabela; essa tentativa não encerra a investigação.' }
   }
 
-  return {
-    success: true,
-    consultedTable,
-    message: 'Dados relevantes encontrados. O Inspetor atualizou a investigação.',
-  }
+  return { success: true, consultedTables, message: 'Resultado relevante encontrado. A investigação foi atualizada; continue conectando os registros e depoimentos.' }
 }
 
 function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^\x24{}()|[\]\\]/g, '\\$&')
+  const special = '.+*?^$()[]{}|\\'
+  return [...value].map((character) => special.includes(character) ? '\\' + character : character).join('')
 }

@@ -1,26 +1,17 @@
 import { useCallback, useState } from 'react'
 import type { InvestigationGuideConfig } from '../../../shared/types/gameplay'
 
-export function useInvestigationProgress({
-  guide,
-}: {
-  scenarioId: string
-  guide: InvestigationGuideConfig
-  tableNames: string[]
-}) {
+export function useInvestigationProgress({ guide }: { scenarioId: string; guide: InvestigationGuideConfig; tableNames: string[] }) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0)
   const [consultedTables, setConsultedTables] = useState<Set<string>>(new Set())
-
   const currentStep = guide.steps[currentStepIndex]
 
-  const registerSuccessfulQuery = useCallback((tableName: string) => {
+  const registerSuccessfulQuery = useCallback((tableNames: string[]) => {
     const step = guide.steps[currentStepIndex]
-    if (!step || !step.requiredTables.includes(tableName)) return false
-
+    if (!step) return false
     const updated = new Set(consultedTables)
-    updated.add(tableName)
+    tableNames.filter((name) => step.requiredTables.includes(name)).forEach((name) => updated.add(name))
     setConsultedTables(updated)
-
     if (step.requiredTables.every((name) => updated.has(name))) {
       setCurrentStepIndex((index) => Math.min(index + 1, guide.steps.length - 1))
       setConsultedTables(new Set())

@@ -1,5 +1,10 @@
 {
   "scenarioId": "scenario-02",
   "culpritId": 4,
-  "explanation": "Renata Martins declarou que não entrou no depósito depois das 19:00. Seu crachá foi registrado na sala às 19:18, e as câmeras a mostram na região às 19:20 e saindo com uma caixa às 19:48. Daniel também entrou no depósito, mas admitiu a visita e a câmera o mostra saindo sem objetos."
+  "explanation": "Renata Martins declarou que não entrou no depósito depois das 19:00. Seu crachá foi registrado na sala às 19:18, e as câmeras a mostram na região às 19:20 e saindo com uma caixa às 19:48. Daniel também entrou no depósito, mas admitiu a visita e a câmera o mostra saindo sem objetos.",
+  "evidence": [
+    "O crachá de Renata abriu o depósito às 19:18.",
+    "As câmeras registraram Renata na região às 19:20 e saindo com uma caixa às 19:48.",
+    "Renata negou ter entrado no depósito após as 19:00."
+  ]
 }

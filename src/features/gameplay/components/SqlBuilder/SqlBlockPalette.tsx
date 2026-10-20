@@ -93,9 +93,12 @@ export function SqlBlockPalette({
             <SqlBlock
               key={block.value}
               {...block}
-              onClick={() =>
-                onAddBlock(block)
-              }
+              onClick={() => onAddBlock(block)}
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'copy'
+                event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
+              }}
             />
           ),
         )}
@@ -107,9 +110,12 @@ export function SqlBlockPalette({
             <SqlBlock
               key={block.value}
               {...block}
-              onClick={() =>
-                onAddBlock(block)
-              }
+              onClick={() => onAddBlock(block)}
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'copy'
+                event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
+              }}
             />
           ),
         )}
@@ -121,9 +127,12 @@ export function SqlBlockPalette({
             <SqlBlock
               key={block.value}
               {...block}
-              onClick={() =>
-                onAddBlock(block)
-              }
+              onClick={() => onAddBlock(block)}
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'copy'
+                event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
+              }}
             />
           ),
         )}
@@ -135,9 +144,12 @@ export function SqlBlockPalette({
             <SqlBlock
               key={block.value}
               {...block}
-              onClick={() =>
-                onAddBlock(block)
-              }
+              onClick={() => onAddBlock(block)}
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'copy'
+                event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
+              }}
             />
           ),
         )}
@@ -149,9 +161,12 @@ export function SqlBlockPalette({
             <SqlBlock
               key={block.value}
               {...block}
-              onClick={() =>
-                onAddBlock(block)
-              }
+              onClick={() => onAddBlock(block)}
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = 'copy'
+                event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
+              }}
             />
           ),
         )}
