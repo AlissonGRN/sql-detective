@@ -19,10 +19,11 @@ export function useSqlBuilder() {
   const moveBlock = (instanceId: string, targetIndex: number) => {
     setQueryBlocks((current) => {
       const sourceIndex = current.findIndex((block) => block.instanceId === instanceId)
-      if (sourceIndex < 0 || targetIndex < 0 || targetIndex >= current.length || sourceIndex === targetIndex) return current
+      if (sourceIndex < 0 || targetIndex < 0 || sourceIndex === targetIndex) return current
       const next = [...current]
       const [moving] = next.splice(sourceIndex, 1)
-      next.splice(targetIndex, 0, moving)
+      const adjustedIndex = sourceIndex < targetIndex ? targetIndex - 1 : targetIndex
+      next.splice(Math.max(0, Math.min(adjustedIndex, next.length)), 0, moving)
       return next
     })
   }
