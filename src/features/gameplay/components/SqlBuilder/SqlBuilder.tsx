@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import type { DragEvent } from 'react'
 import { SqlBlock } from './SqlBlock'
 import { SqlBlockPalette } from './SqlBlockPalette'
 
@@ -34,9 +36,31 @@ export function SqlBuilder({
     query,
 
     addBlock,
+    addBlockAt,
+    moveBlock,
     removeBlock,
     clearQuery,
   } = useSqlBuilder()
+
+  const [dropIndex, setDropIndex] = useState<number | null>(null)
+
+  const handleDrop = (event: DragEvent<HTMLElement>, targetIndex = queryBlocks.length) => {
+    event.preventDefault()
+    setDropIndex(null)
+    const existingId = event.dataTransfer.getData('application/x-sql-block-instance')
+    if (existingId) {
+      moveBlock(existingId, Math.min(targetIndex, Math.max(queryBlocks.length - 1, 0)))
+      return
+    }
+    const rawBlock = event.dataTransfer.getData('application/x-sql-block')
+    if (!rawBlock) return
+    try {
+      const droppedBlock = JSON.parse(rawBlock) as { type: 'keyword' | 'table' | 'column' | 'operator' | 'value' | 'symbol'; label: string; value: string }
+      if (droppedBlock.type && droppedBlock.label && droppedBlock.value) addBlockAt(droppedBlock, targetIndex)
+    } catch {
+      // Ignore data that is not a SQL block.
+    }
+  }
 
   const handleExecute = () => {
     if (!query) {
@@ -108,13 +132,15 @@ export function SqlBuilder({
 
       <div className="mb-5 border-l-2 border-[#c5a56e] bg-[#181714] px-4 py-3 text-xs leading-6 text-[#d9ccb0]">
         <strong className="block font-mono text-[10px] text-[#c5a56e]">1 · MONTE A CONSULTA CLICANDO NOS BLOCOS</strong>
-        Para começar: <code className="font-mono text-[#f0e6d0]">SELECT → * → FROM → tabela</code>.
-        Depois adicione <code className="font-mono">WHERE</code> para filtrar. Clique em um bloco montado para removê-lo.
+        Arraste os blocos da paleta para esta área e solte-os na ordem desejada. Também é possível clicar nos blocos. Arraste os blocos montados para reorganizar; clique em um bloco para removê-lo.
       </div>
 
       {/* QUERY */}
 
       <section
+        onDragOver={(event) => { event.preventDefault(); setDropIndex(queryBlocks.length) }}
+        onDragLeave={() => setDropIndex(null)}
+        onDrop={(event) => handleDrop(event)}
         className="
           mb-5
           min-h-[115px]
@@ -141,8 +167,7 @@ export function SqlBuilder({
                 text-neutral-600
               "
             >
-              Selecione os blocos para
-              montar sua consulta...
+              Arraste blocos SQL para cá ou clique nos blocos da paleta abaixo.
             </p>
           </div>
         ) : (
@@ -156,16 +181,18 @@ export function SqlBuilder({
             {queryBlocks.map(
               (block) => (
                 <SqlBlock
-                  key={
-                    block.instanceId
-                  }
+                  key={block.instanceId}
                   label={block.label}
                   type={block.type}
-                  onClick={() =>
-                    removeBlock(
-                      block.instanceId,
-                    )
-                  }
+                  draggable
+                  onClick={() => removeBlock(block.instanceId)}
+                  onDragStart={(event) => {
+                    event.dataTransfer.effectAllowed = 'move'
+                    event.dataTransfer.setData('application/x-sql-block-instance', block.instanceId)
+                  }}
+                  onDragOver={(event) => { event.preventDefault(); setDropIndex(queryBlocks.findIndex((item) => item.instanceId === block.instanceId)) }}
+                  onDrop={(event) => handleDrop(event, queryBlocks.findIndex((item) => item.instanceId === block.instanceId))}
+                  isDropTarget={dropIndex === queryBlocks.findIndex((item) => item.instanceId === block.instanceId)}
                 />
               ),
             )}
