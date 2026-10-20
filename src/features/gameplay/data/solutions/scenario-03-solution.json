@@ -1,5 +1,10 @@
 {
   "scenarioId": "scenario-03",
   "culpritId": 3,
-  "explanation": "Clara Nunes fez o lance de 6.500 pela obra Noite Azul, mas o pagamento ligado a esse lance foi rejeitado e aponta para outra pessoa como pagadora. A relação entre bids e payments revela a inconsistência que conecta Clara à fraude."
+  "explanation": "Clara Nunes fez o lance de 6.500 pela obra Noite Azul, mas o pagamento ligado a esse lance foi rejeitado e aponta para outra pessoa como pagadora. A relação entre bids e payments revela a inconsistência que conecta Clara à fraude.",
+  "evidence": [
+    "Clara fez o segundo lance de maior valor pela obra Noite Azul: 6.500.",
+    "O pagamento associado ao lance foi rejeitado.",
+    "O registro do pagamento aponta para Ana como pagadora, embora o lance esteja associado a Clara."
+  ]
 }
