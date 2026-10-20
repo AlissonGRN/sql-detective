@@ -65,6 +65,7 @@ interface AccusationResult {
   suspectName: string
 
   explanation?: string
+  evidence?: string[]
 }
 
 export function GameplayPage() {
@@ -225,8 +226,8 @@ function GameplayContent({
       if (currentStep.id !== 'accusation') {
         const evaluation = evaluateInvestigationQuery(currentStep, query, result)
         setFeedback(evaluation.message)
-        if (evaluation.success && evaluation.consultedTable) {
-          registerSuccessfulQuery(evaluation.consultedTable)
+        if (evaluation.success && evaluation.consultedTables.length > 0) {
+          registerSuccessfulQuery(evaluation.consultedTables)
         }
       }
     } catch (error: unknown) {
@@ -282,10 +283,8 @@ function GameplayContent({
 
       suspectName,
 
-      explanation:
-        correct
-          ? solution.explanation
-          : undefined,
+      explanation: correct ? solution.explanation : undefined,
+      evidence: correct ? solution.evidence : undefined,
     })
   }
 
@@ -444,10 +443,8 @@ function GameplayContent({
             accusationResult
               .suspectName
           }
-          explanation={
-            accusationResult
-              .explanation
-          }
+          explanation={accusationResult.explanation}
+          evidence={accusationResult.evidence}
           onClose={() => {
             setAccusationResult(null)
             if (caseCompleted) navigate('/cases')
