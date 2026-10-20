@@ -19,6 +19,7 @@ import {
 import { AccusationResultModal } from '../components/AccusationResultModal'
 import { DatabaseExplorer } from '../components/DatabaseExplorer'
 import { GameHeader } from '../components/GameHeader'
+import { GameplayTutorial } from '../components/GameplayTutorial'
 import { InvestigationGuide } from '../components/InvestigationGuide'
 import { QueryResults } from '../components/QueryResults'
 import { SqlBuilder } from '../components/SqlBuilder/SqlBuilder'
@@ -117,6 +118,13 @@ function GameplayContent({
   scenario,
 }: GameplayContentProps) {
   const navigate = useNavigate()
+  const [showTutorial, setShowTutorial] = useState(() => {
+    try { return localStorage.getItem('sql-detective-tutorial-completed') !== 'yes' } catch { return true }
+  })
+  const closeTutorial = () => {
+    setShowTutorial(false)
+    try { localStorage.setItem('sql-detective-tutorial-completed', 'yes') } catch { /* storage may be unavailable */ }
+  }
   const [feedback, setFeedback] = useState<string | null>(null)
   const [caseCompleted, setCaseCompleted] = useState(false)
   const [
@@ -181,6 +189,8 @@ function GameplayContent({
       tableNames,
     })
 
+  const canAccuse = currentStep?.id === 'accusation'
+
   const suspectsTable =
     scenario.tables.find(
       (table) =>
@@ -231,6 +241,7 @@ function GameplayContent({
   const handleAccuse = (
     suspectId: number,
   ) => {
+    if (!canAccuse) return
     setSelectedCulpritId(
       suspectId,
     )
@@ -306,13 +317,22 @@ function GameplayContent({
           caseTitle={
             gameCase.title
           }
-          onAnalyzeSuspects={() =>
-            setIsSuspectModalOpen(
-              true,
-            )
-          }
+          canAccuse={canAccuse}
+          completedSteps={currentStepIndex}
+          totalSteps={Math.max(gameCase.gameplay.guide.steps.length - 1, 0)}
+          onAnalyzeSuspects={() => {
+            if (canAccuse) setIsSuspectModalOpen(true)
+          }}
         />
 
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-l-4 border-[#c5a56e] bg-[#292824] px-5 py-4">
+          <div>
+            <p className="mb-1 font-mono text-[10px] font-bold tracking-widest text-[#c5a56e]">O QUE FAZER AGORA · ETAPA {currentStepIndex + 1}</p>
+            <p className="text-sm leading-6">{currentStep.objective}</p>
+            {currentStep.id !== 'accusation' && <p className="mt-1 text-xs text-[#bdb19e]">1. Observe as tabelas → 2. Monte a consulta nos blocos → 3. Execute e analise o resultado.</p>}
+          </div>
+          <button type="button" onClick={() => setShowTutorial(true)} className="shrink-0 border border-[#c5a56e] px-4 py-2 font-mono text-xs text-[#e6dfcc] hover:bg-white/10">? COMO JOGAR</button>
+        </div>
         <section
           className="
             grid
@@ -392,7 +412,10 @@ function GameplayContent({
         </section>
       </div>
 
+      {showTutorial && <GameplayTutorial onClose={closeTutorial} />}
+
       {isSuspectModalOpen &&
+        canAccuse &&
         suspectsTable && (
           <SuspectModal
             suspects={
