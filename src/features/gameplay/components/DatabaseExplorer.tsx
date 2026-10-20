@@ -85,6 +85,7 @@ export function DatabaseExplorer({
           >
             {tables.length} tabelas
           </p>
+          <p className="mt-3 border-l-2 border-[#7b2020] pl-2 font-serif text-xs leading-4 text-[#51493d]">Clique em uma tabela para ver exemplos dos registros e descobrir quais informações ela guarda.</p>
         </header>
 
         <div
@@ -168,7 +169,7 @@ export function DatabaseExplorer({
                         text-neutral-500
                       "
                     >
-                      {table.rows.length}
+                      {table.rows.length} registros
                     </span>
                   )}
                 </div>

@@ -125,8 +125,7 @@ export function QueryResults({
         !error &&
         !result && (
           <EmptyState>
-            Execute uma consulta para
-            visualizar os resultados.
+            Monte uma consulta com os blocos SQL acima e clique em “Executar consulta”. Os dados aparecerão aqui para você analisar.
           </EmptyState>
         )}
 
@@ -135,8 +134,7 @@ export function QueryResults({
         result &&
         result.rows.length === 0 && (
           <EmptyState>
-            A consulta foi executada,
-            mas não encontrou registros.
+            A consulta foi executada, mas não encontrou registros. Revise os filtros ou experimente outra tabela; consultas exploratórias fazem parte da investigação.
           </EmptyState>
         )}
 

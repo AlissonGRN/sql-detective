@@ -167,6 +167,7 @@ function GameplayContent({
   const {
     currentStep,
     currentStepIndex,
+    consultedTables,
 
     registerSuccessfulQuery,
   } =
@@ -385,6 +386,7 @@ function GameplayContent({
               currentStepIndex={
                 currentStepIndex
               }
+              consultedTables={consultedTables}
             />
           </div>
         </section>
