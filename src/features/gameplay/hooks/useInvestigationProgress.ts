@@ -29,5 +29,5 @@ export function useInvestigationProgress({
     return false
   }, [guide.steps, currentStepIndex, consultedTables])
 
-  return { currentStep, currentStepIndex, registerSuccessfulQuery }
+  return { currentStep, currentStepIndex, consultedTables, registerSuccessfulQuery }
 }
