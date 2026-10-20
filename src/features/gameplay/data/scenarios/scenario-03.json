@@ -1,0 +1,174 @@
+{
+  "id": "scenario-03",
+  "caseId": "case-003",
+  "isDefault": true,
+  "tables": [
+    {
+      "name": "suspects",
+      "description": "Participantes e funcionários ligados ao leilão.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "name",
+          "type": "TEXT"
+        },
+        {
+          "name": "role",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "name": "Ana Ribeiro",
+          "role": "Proprietária"
+        },
+        {
+          "id": 2,
+          "name": "Bruno Costa",
+          "role": "Colecionador"
+        },
+        {
+          "id": 3,
+          "name": "Clara Nunes",
+          "role": "Intermediária"
+        },
+        {
+          "id": 4,
+          "name": "Diego Martins",
+          "role": "Comprador"
+        }
+      ]
+    },
+    {
+      "name": "artworks",
+      "description": "Obras registradas para o leilão.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "title",
+          "type": "TEXT"
+        },
+        {
+          "name": "owner_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "reserve_price",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "title": "Noite Azul",
+          "owner_id": 1,
+          "reserve_price": 5000
+        },
+        {
+          "id": 2,
+          "title": "Jardim Antigo",
+          "owner_id": 2,
+          "reserve_price": 3000
+        }
+      ]
+    },
+    {
+      "name": "bids",
+      "description": "Lances feitos durante o leilão.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "suspect_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "artwork_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "amount",
+          "type": "INTEGER"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "suspect_id": 2,
+          "artwork_id": 1,
+          "amount": 6000
+        },
+        {
+          "id": 2,
+          "suspect_id": 3,
+          "artwork_id": 1,
+          "amount": 6500
+        },
+        {
+          "id": 3,
+          "suspect_id": 4,
+          "artwork_id": 2,
+          "amount": 3200
+        }
+      ]
+    },
+    {
+      "name": "payments",
+      "description": "Pagamentos associados aos lances.",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "bid_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "payer_id",
+          "type": "INTEGER"
+        },
+        {
+          "name": "amount",
+          "type": "INTEGER"
+        },
+        {
+          "name": "status",
+          "type": "TEXT"
+        }
+      ],
+      "rows": [
+        {
+          "id": 1,
+          "bid_id": 1,
+          "payer_id": 2,
+          "amount": 6000,
+          "status": "CONFIRMED"
+        },
+        {
+          "id": 2,
+          "bid_id": 2,
+          "payer_id": 1,
+          "amount": 6500,
+          "status": "REJECTED"
+        },
+        {
+          "id": 3,
+          "bid_id": 3,
+          "payer_id": 4,
+          "amount": 3200,
+          "status": "CONFIRMED"
+        }
+      ]
+    }
+  ]
+}
