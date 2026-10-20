@@ -98,7 +98,7 @@ export function SqlBlockPalette({
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = 'copy'
                 event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
-              }
+              }}
             />
           ),
         )}
@@ -115,7 +115,7 @@ export function SqlBlockPalette({
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = 'copy'
                 event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
-              }
+              }}
             />
           ),
         )}
@@ -132,7 +132,7 @@ export function SqlBlockPalette({
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = 'copy'
                 event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
-              }
+              }}
             />
           ),
         )}
@@ -149,7 +149,7 @@ export function SqlBlockPalette({
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = 'copy'
                 event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
-              }
+              }}
             />
           ),
         )}
@@ -166,7 +166,7 @@ export function SqlBlockPalette({
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = 'copy'
                 event.dataTransfer.setData('application/x-sql-block', JSON.stringify(block))
-              }
+              }}
             />
           ),
         )}
