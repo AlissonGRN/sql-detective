@@ -168,6 +168,13 @@
                 "'20:36'",
                 "'20:39'"
               ]
+            },
+            "validation": {
+              "column": "suspect_id",
+              "expectedValues": [
+                2
+              ],
+              "requireWhere": true
             }
           },
           {
@@ -381,6 +388,13 @@
                 "2",
                 "4"
               ]
+            },
+            "validation": {
+              "column": "suspect_id",
+              "expectedValues": [
+                4
+              ],
+              "requireWhere": true
             }
           },
           {
