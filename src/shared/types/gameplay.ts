@@ -17,7 +17,6 @@ export interface InvestigationStepConfig {
 
   requiredTables: string[]
 
-  hints: string[]
 
   sqlPalette: SqlPaletteConfig
 
