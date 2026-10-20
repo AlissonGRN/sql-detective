@@ -21,7 +21,7 @@ export function evaluateInvestigationQuery(
     return {
       success: false,
       consultedTable: null,
-      message: 'Consulta executada. Para avançar, investigue a tabela indicada pelo Inspetor.',
+      message: 'Consulta executada e mantida como exploração. Ela ainda não confirma o objetivo atual: confira a tabela sugerida pelo Inspetor ou continue investigando por outro caminho.',
     }
   }
 
@@ -60,7 +60,7 @@ export function evaluateInvestigationQuery(
     return {
       success: false,
       consultedTable,
-      message: 'A consulta não retornou registros. Tente encontrar informações para analisar.',
+      message: 'A consulta é válida, mas não retornou registros. Revise os filtros ou teste outra consulta; explorar faz parte da investigação.',
     }
   }
 
