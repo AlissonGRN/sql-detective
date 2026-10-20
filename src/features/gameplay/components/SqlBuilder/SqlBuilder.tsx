@@ -46,10 +46,11 @@ export function SqlBuilder({
 
   const handleDrop = (event: DragEvent<HTMLElement>, targetIndex = queryBlocks.length) => {
     event.preventDefault()
+    event.stopPropagation()
     setDropIndex(null)
     const existingId = event.dataTransfer.getData('application/x-sql-block-instance')
     if (existingId) {
-      moveBlock(existingId, Math.min(targetIndex, Math.max(queryBlocks.length - 1, 0)))
+      moveBlock(existingId, targetIndex)
       return
     }
     const rawBlock = event.dataTransfer.getData('application/x-sql-block')
