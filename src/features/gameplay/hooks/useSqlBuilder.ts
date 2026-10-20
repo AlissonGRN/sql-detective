@@ -1,82 +1,39 @@
-import {
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
-
-import type {
-  SqlBlockDefinition,
-  SqlQueryBlock,
-} from '../types/sql'
+import { useMemo, useRef, useState } from 'react'
+import type { SqlBlockDefinition, SqlQueryBlock } from '../types/sql'
 
 export function useSqlBuilder() {
-  const [
-    queryBlocks,
-    setQueryBlocks,
-  ] = useState<SqlQueryBlock[]>([])
-
+  const [queryBlocks, setQueryBlocks] = useState<SqlQueryBlock[]>([])
   const nextId = useRef(0)
 
-  const addBlock = (
-    block: SqlBlockDefinition,
-  ) => {
+  const addBlockAt = (block: SqlBlockDefinition, index?: number) => {
     nextId.current += 1
-
-    const queryBlock: SqlQueryBlock = {
-      ...block,
-      instanceId: `sql-block-${nextId.current}`,
-    }
-
-    setQueryBlocks(
-      (currentBlocks) => [
-        ...currentBlocks,
-        queryBlock,
-      ],
-    )
+    const queryBlock: SqlQueryBlock = { ...block, instanceId: `sql-block-${nextId.current}` }
+    setQueryBlocks((current) => {
+      const next = [...current]
+      const position = index === undefined ? next.length : Math.max(0, Math.min(index, next.length))
+      next.splice(position, 0, queryBlock)
+      return next
+    })
   }
-
-  const removeBlock = (
-    instanceId: string,
-  ) => {
-    setQueryBlocks(
-      (currentBlocks) =>
-        currentBlocks.filter(
-          (block) =>
-            block.instanceId !==
-            instanceId,
-        ),
-    )
+  const addBlock = (block: SqlBlockDefinition) => addBlockAt(block)
+  const moveBlock = (instanceId: string, targetIndex: number) => {
+    setQueryBlocks((current) => {
+      const sourceIndex = current.findIndex((block) => block.instanceId === instanceId)
+      if (sourceIndex < 0 || targetIndex < 0 || targetIndex >= current.length || sourceIndex === targetIndex) return current
+      const next = [...current]
+      const [moving] = next.splice(sourceIndex, 1)
+      next.splice(targetIndex, 0, moving)
+      return next
+    })
   }
-
-  const clearQuery = () => {
-    setQueryBlocks([])
-  }
-
-  const query = useMemo(() => {
-    return formatSqlQuery(
-      queryBlocks,
-    )
-  }, [queryBlocks])
-
-  return {
-    queryBlocks,
-    query,
-
-    addBlock,
-    removeBlock,
-    clearQuery,
-  }
+  const removeBlock = (instanceId: string) => setQueryBlocks((current) => current.filter((block) => block.instanceId !== instanceId))
+  const clearQuery = () => setQueryBlocks([])
+  const query = useMemo(() => formatSqlQuery(queryBlocks), [queryBlocks])
+  return { queryBlocks, query, addBlock, addBlockAt, moveBlock, removeBlock, clearQuery }
 }
 
-function formatSqlQuery(
-  blocks: SqlQueryBlock[],
-) {
-  return blocks
-    .map((block) => block.value)
-    .join(' ')
-    .replace(/\s+,/g, ',')
-    .replace(/\s+;/g, ';')
-    .replace(/\(\s+/g, '(')
-    .replace(/\s+\)/g, ')')
-    .trim()
+function formatSqlQuery(blocks: SqlQueryBlock[]) {
+  return blocks.map((block) => block.value).join(' ')
+    .replace(/\s+,/g, ',').replace(/\s+;/g, ';')
+    .replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').trim()
 }
