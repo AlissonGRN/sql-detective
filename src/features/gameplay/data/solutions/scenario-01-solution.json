@@ -1,5 +1,10 @@
 {
   "scenarioId": "scenario-01",
   "culpritId": 2,
-  "explanation": "Carlos Mendes negou ter entrado na Sala Bellmont, mas seu cartão registrou acesso às 20:36 e a câmera o registrou no corredor às 20:39 e às 20:52. O depoimento contradiz os registros."
+  "explanation": "Carlos Mendes negou ter entrado na Sala Bellmont, mas seu cartão registrou acesso às 20:36 e a câmera o registrou no corredor às 20:39 e às 20:52. O depoimento contradiz os registros.",
+  "evidence": [
+    "O cartão de Carlos registrou acesso à Sala Bellmont às 20:36.",
+    "A câmera registrou Carlos no corredor às 20:39 e novamente às 20:52.",
+    "Carlos afirmou no depoimento que não entrou na Sala Bellmont naquela noite."
+  ]
 }
