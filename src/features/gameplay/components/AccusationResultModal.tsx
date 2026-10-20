@@ -4,6 +4,7 @@ interface AccusationResultModalProps {
   suspectName: string
 
   explanation?: string
+  evidence?: string[]
 
   onClose: () => void
 }
@@ -12,6 +13,7 @@ export function AccusationResultModal({
   correct,
   suspectName,
   explanation,
+  evidence = [],
   onClose,
 }: AccusationResultModalProps) {
   return (
@@ -94,6 +96,15 @@ export function AccusationResultModal({
             registros antes de fazer
             uma nova acusação.
           </p>
+        )}
+
+        {correct && evidence.length > 0 && (
+          <div className="mt-5 border-t border-black/15 pt-4">
+            <p className="mb-2 font-mono text-[9px] font-bold tracking-[0.15em] text-[#496446]">EVIDÊNCIAS DECISIVAS</p>
+            <ul className="list-disc space-y-1 pl-5 font-serif text-sm leading-5 text-[#51493d]">
+              {evidence.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
         )}
 
         <div
