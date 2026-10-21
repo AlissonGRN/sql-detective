@@ -21,7 +21,7 @@ export function GameHeader({
   return (
     <header
       className="
-        mb-10
+        mb-6
         flex
         items-center
         justify-between
