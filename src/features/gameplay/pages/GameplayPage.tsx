@@ -127,6 +127,7 @@ function GameplayContent({
     try { localStorage.setItem('sql-detective-tutorial-completed', 'yes') } catch { /* storage may be unavailable */ }
   }
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [showDatabase, setShowDatabase] = useState(false)
   const [caseCompleted, setCaseCompleted] = useState(false)
   const [
     queryResult,
@@ -324,90 +325,42 @@ function GameplayContent({
           }}
         />
 
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-l-4 border-[#c5a56e] bg-[#292824] px-5 py-4">
-          <div>
-            <p className="mb-1 font-mono text-[10px] font-bold tracking-widest text-[#c5a56e]">O QUE FAZER AGORA · ETAPA {currentStepIndex + 1}</p>
-            <p className="text-sm leading-6">{currentStep.objective}</p>
-            {currentStep.id !== 'accusation' && <p className="mt-1 text-xs text-[#bdb19e]">1. Observe as tabelas → 2. Monte a consulta nos blocos → 3. Execute e analise o resultado.</p>}
+        <section className="mb-6 border-l-4 border-[#c5a56e] bg-[#292824] px-5 py-5 md:px-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[10px] font-bold tracking-widest text-[#c5a56e]">SUA MISSÃO · ETAPA {currentStepIndex + 1}</span>
+                <span className="border border-[#504c43] px-2 py-1 font-mono text-[9px] text-[#bdb19e]">{currentStepIndex + 1} de {gameCase.gameplay.guide.steps.length}</span>
+              </div>
+              <h2 className="mb-2 font-serif text-xl font-bold text-[#e6dfcc]">{currentStep.title}</h2>
+              <p className="max-w-3xl text-sm leading-6 text-[#d9ccb0]">{currentStep.objective}</p>
+              {currentStep.suggestedTable && <p className="mt-3 text-xs text-[#bdb19e]">Ponto de partida sugerido: <strong className="font-mono text-[#c5a56e]">{currentStep.suggestedTable}</strong></p>}
+            </div>
+            <button type="button" onClick={() => setShowTutorial(true)} className="shrink-0 self-start border border-[#625c50] px-4 py-2 font-mono text-xs text-[#e6dfcc] transition hover:bg-white/5">? Como jogar</button>
           </div>
-          <button type="button" onClick={() => setShowTutorial(true)} className="shrink-0 border border-[#c5a56e] px-4 py-2 font-mono text-xs text-[#e6dfcc] hover:bg-white/10">? COMO JOGAR</button>
+          <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4 text-xs text-[#bdb19e]">
+            <span className="font-mono text-[#c5a56e]">PRÓXIMOS PASSOS</span><span>1. Explore os dados</span><span aria-hidden="true">→</span><span>2. Monte a consulta</span><span aria-hidden="true">→</span><span>3. Analise o resultado</span>
+          </div>
+        </section>
+
+        <div className="mb-5">
+          <button type="button" aria-expanded={showDatabase} aria-controls="database-explorer-panel" onClick={() => setShowDatabase((open) => !open)} className="flex w-full items-center justify-between gap-3 border border-[#625c50] bg-[#292824] px-4 py-3 text-left transition hover:border-[#c5a56e]">
+            <span className="flex min-w-0 items-center gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#40392c] text-[#c5a56e]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
+              <span><span className="block font-mono text-xs font-bold text-[#e6dfcc]">Explorar banco de dados</span><span className="mt-1 block text-xs text-[#bdb19e]">{scenario.tables.length} tabelas disponíveis{currentStep.suggestedTable ? ` · sugestão: ${currentStep.suggestedTable}` : ''}</span></span>
+            </span>
+            <span className="font-mono text-xs text-[#c5a56e]">{showDatabase ? 'FECHAR −' : 'ABRIR +'}</span>
+          </button>
+          {showDatabase && <div id="database-explorer-panel" className="mt-2 max-w-3xl"><DatabaseExplorer databaseName="bell_db" tables={scenario.tables} suggestedTable={currentStep.suggestedTable} /></div>}
         </div>
-        <section
-          className="
-            grid
-            grid-cols-1
-            gap-7
 
-            xl:grid-cols-[245px_minmax(0,1fr)_300px]
-          "
-        >
-          <DatabaseExplorer
-            databaseName="bell_db"
-            tables={
-              scenario.tables
-            }
-            suggestedTable={
-              currentStep
-                .suggestedTable
-            }
-          />
-
-          <div className="space-y-8">
-            <SqlBuilder
-              tables={
-                scenario.tables
-              }
-              paletteConfig={
-                currentStep
-                  .sqlPalette
-              }
-              disabled={
-                isDatabaseLoading ||
-                Boolean(
-                  databaseError,
-                )
-              }
-              onExecute={
-                handleExecuteQuery
-              }
-            />
-
-            {feedback && (
-              <p role="status" className="border-l-2 border-[#b79762] bg-[#282824] px-4 py-3 font-mono text-xs text-[#e6dfcc]">{feedback}</p>
-            )}
-
-            <QueryResults
-              result={
-                queryResult
-              }
-              error={
-                queryError ??
-                databaseError
-              }
-              isDatabaseLoading={
-                isDatabaseLoading
-              }
-            />
+        <section className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
+          <div className="min-w-0 space-y-5">
+            <SqlBuilder tables={scenario.tables} paletteConfig={currentStep.sqlPalette} disabled={isDatabaseLoading || Boolean(databaseError)} onExecute={handleExecuteQuery} />
+            {feedback && <div role="status" className="border-l-2 border-[#b79762] bg-[#282824] px-4 py-3"><p className="mb-1 font-mono text-[9px] font-bold tracking-widest text-[#c5a56e]">ANÁLISE DA CONSULTA</p><p className="text-sm leading-5 text-[#e6dfcc]">{feedback}</p></div>}
+            <QueryResults result={queryResult} error={queryError ?? databaseError} isDatabaseLoading={isDatabaseLoading} />
           </div>
-
-          <div
-            className="
-              xl:sticky
-              xl:top-6
-            "
-          >
-            <InvestigationGuide
-              config={
-                gameCase
-                  .gameplay
-                  .guide
-              }
-              currentStepIndex={
-                currentStepIndex
-              }
-              consultedTables={consultedTables}
-            />
-          </div>
+          <div className="xl:sticky xl:top-5"><InvestigationGuide config={gameCase.gameplay.guide} currentStepIndex={currentStepIndex} consultedTables={consultedTables} /></div>
         </section>
       </div>
 
