@@ -1,4 +1,6 @@
 import {
+  useEffect,
+  useRef,
   useState,
 } from 'react'
 
@@ -127,6 +129,13 @@ function GameplayContent({
     try { localStorage.setItem('sql-detective-tutorial-completed', 'yes') } catch { /* storage may be unavailable */ }
   }
   const [feedback, setFeedback] = useState<string | null>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (queryResult || queryError) {
+      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }, [queryResult, queryError])
   const [showDatabase, setShowDatabase] = useState(false)
   const [caseCompleted, setCaseCompleted] = useState(false)
   const [
@@ -358,7 +367,7 @@ function GameplayContent({
           <div className="min-w-0 space-y-5">
             <SqlBuilder tables={scenario.tables} paletteConfig={currentStep.sqlPalette} disabled={isDatabaseLoading || Boolean(databaseError)} onExecute={handleExecuteQuery} />
             {feedback && <div role="status" className="border-l-2 border-[#b79762] bg-[#282824] px-4 py-3"><p className="mb-1 font-mono text-[9px] font-bold tracking-widest text-[#c5a56e]">ANÁLISE DA CONSULTA</p><p className="text-sm leading-5 text-[#e6dfcc]">{feedback}</p></div>}
-            <QueryResults result={queryResult} error={queryError ?? databaseError} isDatabaseLoading={isDatabaseLoading} />
+            <div ref={resultsRef} className="scroll-mt-6" aria-live="polite">\n              <QueryResults result={queryResult} error={queryError ?? databaseError} isDatabaseLoading={isDatabaseLoading} />\n            </div>
           </div>
           <div className="xl:sticky xl:top-5"><InvestigationGuide config={gameCase.gameplay.guide} currentStepIndex={currentStepIndex} consultedTables={consultedTables} /></div>
         </section>
