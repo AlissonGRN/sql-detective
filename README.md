@@ -29,6 +29,10 @@ Para gerar a versão de produção:
 npm run build
 ```
 
+## Respostas dos casos
+
+O projeto inclui um documento Markdown com as soluções dos casos, as principais evidências e consultas SQL de exemplo. Consulte [Respostas dos casos](docs/respostas-dos-casos.md).
+
 ## Acesso
 
 Versão publicada: https://sql-detective-five.vercel.app
