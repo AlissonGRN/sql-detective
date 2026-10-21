@@ -303,6 +303,8 @@ export function SqlBuilder({
           2 · EXECUTAR CONSULTA →
         </button>
       </footer>
+
+      <p className="mt-3 text-right text-[11px] leading-5 text-[#bdb19e]">Após executar, a tela irá até os resultados exibidos abaixo deste editor.</p>
     </article>
   )
 }
