@@ -132,6 +132,7 @@ function GameplayContent({
   const resultsRef = useRef<HTMLDivElement>(null)
 
   const [showDatabase, setShowDatabase] = useState(false)
+  const [showSqlCheatSheet, setShowSqlCheatSheet] = useState(false)
   const [caseCompleted, setCaseCompleted] = useState(false)
   const [
     queryResult,
@@ -366,6 +367,16 @@ function GameplayContent({
 
         <section className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
           <div className="min-w-0 space-y-5">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowSqlCheatSheet(true)}
+                aria-haspopup="dialog"
+                className="border border-[#625c50] bg-[#292824] px-4 py-2 font-mono text-xs text-[#e6dfcc] transition hover:border-[#c5a56e] hover:text-[#c5a56e]"
+              >
+                ? Cola SQL
+              </button>
+            </div>
             <SqlBuilder tables={scenario.tables} paletteConfig={currentStep.sqlPalette} disabled={isDatabaseLoading || Boolean(databaseError)} onExecute={handleExecuteQuery} />
             {feedback && <div role="status" className="border-l-2 border-[#b79762] bg-[#282824] px-4 py-3"><p className="mb-1 font-mono text-[9px] font-bold tracking-widest text-[#c5a56e]">ANÁLISE DA CONSULTA</p><p className="text-sm leading-5 text-[#e6dfcc]">{feedback}</p></div>}
             <div ref={resultsRef} className="scroll-mt-6" aria-live="polite">
@@ -377,6 +388,71 @@ function GameplayContent({
       </div>
 
       {showTutorial && <GameplayTutorial onClose={closeTutorial} />}
+
+      {showSqlCheatSheet && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setShowSqlCheatSheet(false)
+          }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="sql-cheat-sheet-title"
+            className="my-auto max-h-[85vh] w-full max-w-xl overflow-y-auto border border-[#625c50] bg-[#292824] p-5 text-[#e6dfcc] shadow-2xl sm:p-7"
+          >
+            <div className="mb-5 flex items-start justify-between gap-4">
+              <div>
+                <p className="mb-1 font-mono text-[9px] tracking-[0.2em] text-[#c5a56e]">GUIA DE CONSULTAS</p>
+                <h2 id="sql-cheat-sheet-title" className="font-serif text-2xl font-bold">Cola SQL</h2>
+                <p className="mt-2 text-sm leading-5 text-[#bdb19e]">Use estes exemplos como referência e adapte-os aos dados da investigação. Eles não revelam quem é o culpado.</p>
+              </div>
+              <button type="button" onClick={() => setShowSqlCheatSheet(false)} aria-label="Fechar cola SQL" className="border border-[#625c50] px-3 py-2 text-sm hover:border-[#c5a56e]">Fechar ×</button>
+            </div>
+
+            <div className="space-y-4">
+              <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
+                <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">1. CONSULTAR UMA TABELA</h3>
+                <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT *
+FROM ${currentStep.suggestedTable ?? 'nome_da_tabela'};`}</code></pre>
+                <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>SELECT</strong> escolhe o que mostrar. <strong>FROM</strong> indica de qual tabela vêm os dados. O asterisco (*) significa todas as colunas.</p>
+              </article>
+
+              <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
+                <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">2. FILTRAR RESULTADOS</h3>
+                <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT *
+FROM ${currentStep.suggestedTable ?? 'nome_da_tabela'}
+WHERE coluna = 'valor';`}</code></pre>
+                <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>WHERE</strong> mostra apenas as linhas que atendem à condição. Troque coluna, operador e valor pelos dados que deseja investigar.</p>
+              </article>
+
+              {currentStep.sqlPalette.keywords.includes('AND') && (
+                <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
+                  <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">3. COMBINAR CONDIÇÕES</h3>
+                  <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT *
+FROM ${currentStep.suggestedTable ?? 'nome_da_tabela'}
+WHERE condicao_1
+  AND condicao_2;`}</code></pre>
+                  <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>AND</strong> exige que as duas condições sejam verdadeiras.</p>
+                </article>
+              )}
+
+              {currentStep.sqlPalette.keywords.includes('JOIN') && (
+                <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
+                  <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">4. RELACIONAR TABELAS</h3>
+                  <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT tabela_a.coluna, tabela_b.coluna
+FROM tabela_a
+JOIN tabela_b ON tabela_a.id = tabela_b.tabela_a_id;`}</code></pre>
+                  <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>JOIN</strong> combina registros relacionados. A condição após <strong>ON</strong> explica como as tabelas se conectam.</p>
+                </article>
+              )}
+
+              <p className="border-t border-white/10 pt-4 text-xs leading-5 text-[#bdb19e]">Dica: comece pela tabela sugerida na missão. Leia as colunas no explorador do banco e formule uma pergunta específica antes de executar a consulta.</p>
+            </div>
+          </section>
+        </div>
+      )}
 
       {isSuspectModalOpen &&
         canAccuse &&
