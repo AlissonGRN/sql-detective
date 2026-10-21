@@ -352,7 +352,7 @@ function GameplayContent({
           </div>
         </section>
 
-        <div className="mb-5">
+        <div className="mb-10">
           <button type="button" aria-expanded={showDatabase} aria-controls="database-explorer-panel" onClick={() => setShowDatabase((open) => !open)} className="flex w-full items-center justify-between gap-3 border border-[#625c50] bg-[#292824] px-4 py-3 text-left transition hover:border-[#c5a56e]">
             <span className="flex min-w-0 items-center gap-3">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#40392c] text-[#c5a56e]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
