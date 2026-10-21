@@ -131,10 +131,10 @@ export function SqlBuilder({
         </span>
       </header>
 
-      <div className="mb-5 border-l-2 border-[#c5a56e] bg-[#181714] px-4 py-3 text-xs leading-6 text-[#d9ccb0]">
-        <strong className="block font-mono text-[10px] text-[#c5a56e]">1 · MONTE A CONSULTA COM OS BLOCOS</strong>
-        Arraste os blocos da paleta para esta área e solte-os na ordem desejada. Também é possível clicar nos blocos. Arraste os blocos montados para reorganizar; clique em um bloco para removê-lo.
-      </div>
+      <details className="mb-4 border-l-2 border-[#c5a56e] bg-[#181714] px-4 py-3 text-xs leading-5 text-[#d9ccb0]">
+        <summary className="cursor-pointer font-mono text-[10px] font-bold text-[#c5a56e]">COMO USAR OS BLOCOS SQL <span className="ml-2 text-[#837c6e]">ABRIR</span></summary>
+        <p className="mt-3">Arraste os blocos da paleta para a área de montagem ou clique neles para adicioná-los. Arraste os blocos montados para reorganizar a consulta e clique em um bloco para removê-lo. Depois, selecione “Executar consulta” para analisar os resultados.</p>
+      </details>
 
       {/* QUERY */}
 
