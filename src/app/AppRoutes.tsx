@@ -7,7 +7,6 @@ import {
 import { MainMenuPage } from '../features/main-menu/pages/MainMenuPage'
 import { CasesPage } from '../features/cases/pages/CasesPage'
 import { GameplayPage } from '../features/gameplay/pages/GameplayPage'
-import { TutorialPage } from '../features/tutorial/pages/TutorialPage'
 import { HowToPlayPage } from '../features/how-to-play/pages/HowToPlayPage'
 
 export function AppRoutes() {
@@ -29,13 +28,13 @@ export function AppRoutes() {
       />
 
       <Route
-        path="/tutorial"
-        element={<TutorialPage />}
+        path="/how-to-play"
+        element={<HowToPlayPage />}
       />
 
       <Route
-        path="/how-to-play"
-        element={<HowToPlayPage />}
+        path="/tutorial"
+        element={<Navigate to="/how-to-play" replace />}
       />
 
       <Route

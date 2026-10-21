@@ -5,11 +5,6 @@ export const menuOptions = [
     primary: true,
   },
   {
-    label: 'TUTORIAL',
-    to: '/tutorial',
-    primary: false,
-  },
-  {
     label: 'COMO JOGAR',
     to: '/how-to-play',
     primary: false,
