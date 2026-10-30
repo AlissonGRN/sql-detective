@@ -189,7 +189,7 @@ function GameplayContent({ gameCase, scenario }: GameplayContentProps) {
             </button>
             {showDatabase && (
               <div id="database-explorer-panel" className="border-t border-white/10 p-3 sm:p-4">
-                <DatabaseExplorer databaseName="bell_db" tables={scenario.tables} suggestedTable={currentStep.suggestedTable} />
+                <DatabaseExplorer databaseName="Banco da investigação" tables={scenario.tables} suggestedTable={currentStep.suggestedTable} />
               </div>
             )}
           </div>

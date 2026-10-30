@@ -137,9 +137,9 @@
                 "suspects"
               ],
               "columns": [
-                "*",
-                "occupation",
-                "id"
+                "id",
+                "name",
+                "occupation"
               ],
               "operators": [
                 "="
@@ -147,18 +147,29 @@
               "values": [
                 "'Segurança'"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
+              "requiredConditions": [
+                "occupation = 'Segurança'"
+              ],
+              "requiredSelectItems": [
+                "id",
+                "name"
+              ],
+              "expectedColumns": [
+                "id",
+                "name"
+              ],
+              "expectedRowCount": 1,
               "column": "id",
               "expectedValues": [
                 2
-              ],
-              "requiredConditions": [
-                "occupation = 'Segurança'"
               ]
             }
           },
@@ -183,7 +194,8 @@
                 "camera_logs"
               ],
               "columns": [
-                "*",
+                "time",
+                "event",
                 "suspect_id"
               ],
               "operators": [
@@ -192,19 +204,25 @@
               "values": [
                 "2"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
-              "column": "suspect_id",
-              "expectedValues": [
-                2
-              ],
               "expectedRowCount": 2,
               "requiredConditions": [
                 "suspect_id = 2"
+              ],
+              "requiredSelectItems": [
+                "time",
+                "event"
+              ],
+              "expectedColumns": [
+                "time",
+                "event"
               ]
             }
           },
@@ -229,7 +247,7 @@
                 "interviews"
               ],
               "columns": [
-                "*",
+                "statement",
                 "suspect_id"
               ],
               "operators": [
@@ -238,19 +256,23 @@
               "values": [
                 "2"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
-              "column": "suspect_id",
-              "expectedValues": [
-                2
-              ],
               "expectedRowCount": 1,
               "requiredConditions": [
                 "suspect_id = 2"
+              ],
+              "requiredSelectItems": [
+                "statement"
+              ],
+              "expectedColumns": [
+                "statement"
               ]
             }
           },
@@ -379,9 +401,9 @@
                 "access_logs"
               ],
               "columns": [
-                "*",
-                "room_id",
-                "suspect_id"
+                "suspect_id",
+                "time",
+                "room_id"
               ],
               "operators": [
                 "="
@@ -389,20 +411,31 @@
               "values": [
                 "3"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
+              "requiredConditions": [
+                "room_id = 3"
+              ],
+              "requiredSelectItems": [
+                "suspect_id",
+                "time"
+              ],
+              "expectedColumns": [
+                "suspect_id",
+                "time"
+              ],
+              "expectedRowCount": 3,
               "column": "suspect_id",
               "expectedValues": [
                 2,
                 4,
                 5
-              ],
-              "requiredConditions": [
-                "room_id = 3"
               ]
             }
           },
@@ -429,8 +462,8 @@
               ],
               "columns": [
                 "suspect_id",
-                "room_id",
-                "time"
+                "time",
+                "room_id"
               ],
               "operators": [
                 "=",
@@ -449,15 +482,19 @@
                 "WHERE",
                 "AND"
               ],
-              "column": "suspect_id",
-              "expectedValues": [
-                2,
-                4
-              ],
               "requiredConditions": [
                 "room_id = 3",
                 "time >= '19:00'"
-              ]
+              ],
+              "requiredSelectItems": [
+                "suspect_id",
+                "time"
+              ],
+              "expectedColumns": [
+                "suspect_id",
+                "time"
+              ],
+              "expectedRowCount": 2
             }
           },
           {
@@ -481,7 +518,8 @@
                 "camera_logs"
               ],
               "columns": [
-                "*",
+                "time",
+                "event",
                 "suspect_id"
               ],
               "operators": [
@@ -490,19 +528,25 @@
               "values": [
                 "4"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
-              "column": "suspect_id",
-              "expectedValues": [
-                4
-              ],
               "expectedRowCount": 2,
               "requiredConditions": [
                 "suspect_id = 4"
+              ],
+              "requiredSelectItems": [
+                "time",
+                "event"
+              ],
+              "expectedColumns": [
+                "time",
+                "event"
               ]
             }
           },
@@ -527,7 +571,7 @@
                 "interviews"
               ],
               "columns": [
-                "*",
+                "statement",
                 "suspect_id"
               ],
               "operators": [
@@ -536,19 +580,23 @@
               "values": [
                 "4"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
-              "column": "suspect_id",
-              "expectedValues": [
-                4
-              ],
               "expectedRowCount": 1,
               "requiredConditions": [
                 "suspect_id = 4"
+              ],
+              "requiredSelectItems": [
+                "statement"
+              ],
+              "expectedColumns": [
+                "statement"
               ]
             }
           },
@@ -716,9 +764,9 @@
                 "payments"
               ],
               "columns": [
-                "*",
-                "status",
-                "bid_id"
+                "bid_id",
+                "payer_id",
+                "status"
               ],
               "operators": [
                 "="
@@ -726,19 +774,27 @@
               "values": [
                 "'REJECTED'"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
-              "column": "id",
-              "expectedValues": [
-                2
-              ],
               "expectedRowCount": 1,
               "requiredConditions": [
                 "status = 'REJECTED'"
+              ],
+              "requiredSelectItems": [
+                "bid_id",
+                "payer_id",
+                "status"
+              ],
+              "expectedColumns": [
+                "bid_id",
+                "payer_id",
+                "status"
               ]
             }
           },
@@ -822,7 +878,7 @@
                 "suspects"
               ],
               "columns": [
-                "*",
+                "name",
                 "id"
               ],
               "operators": [
@@ -831,19 +887,23 @@
               "values": [
                 "3"
               ],
-              "symbols": []
+              "symbols": [
+                ","
+              ]
             },
             "validation": {
               "requiredKeywords": [
                 "WHERE"
               ],
-              "column": "id",
-              "expectedValues": [
-                3
-              ],
               "expectedRowCount": 1,
               "requiredConditions": [
                 "id = 3"
+              ],
+              "requiredSelectItems": [
+                "name"
+              ],
+              "expectedColumns": [
+                "name"
               ]
             }
           },
