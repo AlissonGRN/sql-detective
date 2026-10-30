@@ -3,111 +3,27 @@ import { Link } from 'react-router'
 interface GameHeaderProps {
   caseNumber: string
   caseTitle: string
-
   onAnalyzeSuspects: () => void
+  onOpenHelp: () => void
   canAccuse: boolean
   completedSteps: number
   totalSteps: number
 }
 
-export function GameHeader({
-  caseNumber,
-  caseTitle,
-  onAnalyzeSuspects,
-  canAccuse,
-  completedSteps,
-  totalSteps,
-}: GameHeaderProps) {
+export function GameHeader({ caseNumber, caseTitle, onAnalyzeSuspects, onOpenHelp, canAccuse, completedSteps, totalSteps }: GameHeaderProps) {
   return (
-    <header
-      className="
-        mb-6
-        flex
-        items-center
-        justify-between
-        gap-5
-      "
-    >
-      <Link
-        to="/cases"
-        className="
-          font-mono
-          text-xs
-          text-neutral-500
-          transition
-          hover:text-neutral-200
-        "
-      >
-        ← ARQUIVO DE CASOS
-      </Link>
-
-      <div className="text-center">
-        <p
-          className="
-            font-mono
-            text-[9px]
-            tracking-[0.25em]
-            text-neutral-600
-          "
-        >
-          {caseNumber}
-        </p>
-
-        <h1
-          className="
-            font-serif
-            text-xl
-            font-bold
-          "
-        >
-          {caseTitle}
-        </h1>
+    <header className="mb-5 flex flex-col gap-4 border-b border-white/10 pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <Link to="/cases" className="font-mono text-xs text-neutral-500 transition hover:text-neutral-200">← CASOS</Link>
+      <div className="min-w-0 text-left sm:text-center">
+        <p className="font-mono text-[9px] tracking-[0.2em] text-[#837c6e]">{caseNumber}</p>
+        <h1 className="font-serif text-xl font-bold text-[#e6dfcc]">{caseTitle}</h1>
       </div>
-
-      <button
-        type="button"
-        onClick={onAnalyzeSuspects}
-        disabled={!canAccuse}
-        title={canAccuse ? "Apresentar acusação" : "Conclua as etapas investigativas para acusar"}
-        className="
-          flex
-          items-center
-          gap-2
-          bg-[#c5a56e]
-          px-4
-          py-3
-          font-mono
-          text-[10px]
-          font-bold
-          text-[#28231b]
-          shadow
-          transition
-
-          hover:bg-[#d1b276]
-          disabled:cursor-not-allowed
-          disabled:opacity-40
-        "
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          className="h-4 w-4"
-        >
-          <circle
-            cx="11"
-            cy="11"
-            r="7"
-          />
-
-          <path
-            d="m20 20-3.5-3.5"
-          />
-        </svg>
-
-        {canAccuse ? 'ANALISAR SUSPEITOS' : `INVESTIGANDO ${completedSteps}/${totalSteps}`}
-      </button>
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={onOpenHelp} className="border border-[#625c50] px-3 py-3 font-mono text-[10px] font-bold text-[#d9ccb0] transition hover:border-[#c5a56e]">AJUDA</button>
+        <button type="button" onClick={onAnalyzeSuspects} disabled={!canAccuse} title={canAccuse ? "Apresentar conclusão" : "Conclua as etapas para apresentar a acusação"} className="bg-[#c5a56e] px-4 py-3 font-mono text-[10px] font-bold text-[#28231b] transition hover:bg-[#d1b276] disabled:cursor-not-allowed disabled:opacity-40">
+          {canAccuse ? 'ANALISAR SUSPEITOS' : `${completedSteps}/${totalSteps} ETAPAS`}
+        </button>
+      </div>
     </header>
   )
 }

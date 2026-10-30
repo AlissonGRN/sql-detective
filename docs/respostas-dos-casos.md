@@ -1,14 +1,36 @@
 # Respostas dos casos — SQL Detective
 
-> Material de consulta para professores e para conferência após jogar. As consultas seguem a progressão dos níveis: primeiro comandos simples em uma tabela; depois filtros; por fim, relacionamento entre tabelas com `JOIN`. São exemplos de solução, não respostas únicas obrigatórias.
+Este material acompanha a nova progressão pedagógica. As consultas são exemplos de solução; o objetivo é compreender a estrutura e interpretar os registros.
 
 ## Caso #001 — O Quadro Desaparecido
 
 **Responsável: Carlos Mendes (ID 2), segurança.**
 
-### Como chegar à resposta
+### Progressão
 
-Comece consultando os registros de câmera. Não é necessário usar `JOIN` neste caso: a tabela já contém o identificador do suspeito, o horário e o evento.
+1. Consulte todas as pessoas:
+
+```sql
+SELECT *
+FROM suspects;
+```
+
+2. Escolha apenas nome e profissão:
+
+```sql
+SELECT name, occupation
+FROM suspects;
+```
+
+3. Filtre a profissão:
+
+```sql
+SELECT *
+FROM suspects
+WHERE occupation = 'Segurança';
+```
+
+4. Confira a câmera:
 
 ```sql
 SELECT *
@@ -16,9 +38,7 @@ FROM camera_logs
 WHERE suspect_id = 2;
 ```
 
-**O que procurar:** Carlos aparece entrando no corredor da Sala Bellmont às 20:39 e saindo às 20:52.
-
-Depois, confira o depoimento na tabela `interviews`:
+5. Compare com o depoimento:
 
 ```sql
 SELECT *
@@ -26,26 +46,42 @@ FROM interviews
 WHERE suspect_id = 2;
 ```
 
-Carlos diz que não entrou na Sala Bellmont naquela noite. A gravação contradiz sua declaração.
+**O que observar:** os registros da câmera mostram Carlos entrando e saindo do corredor da Sala Bellmont. No depoimento, ele afirma que não entrou na sala naquela noite.
 
-**Conceitos praticados:** `SELECT`, `FROM` e `WHERE`.
+**Conceitos praticados:** tabelas, registros, colunas, `SELECT`, `FROM` e `WHERE` com igualdade.
 
 ## Caso #002 — O Protótipo Desaparecido
 
 **Responsável: Renata Martins (ID 4), técnica de laboratório.**
 
-### Como chegar à resposta
+### Progressão
 
-Neste caso, o jogador pode combinar condições simples para filtrar os registros de acesso ao depósito:
+1. Encontre quem saiu às 19:00 ou depois:
+
+```sql
+SELECT suspect_id, exit_time
+FROM visits
+WHERE exit_time >= '19:00';
+```
+
+2. Consulte quem acessou o depósito (sala 3):
 
 ```sql
 SELECT *
+FROM access_logs
+WHERE room_id = 3;
+```
+
+3. Combine o local e o horário:
+
+```sql
+SELECT suspect_id, time
 FROM access_logs
 WHERE room_id = 3
   AND time >= '19:00';
 ```
 
-O resultado mostra quem acessou o depósito depois das 19:00. Para conferir o que aconteceu, consulte os registros de câmera:
+4. Confira a câmera:
 
 ```sql
 SELECT *
@@ -53,19 +89,40 @@ FROM camera_logs
 WHERE suspect_id = 4;
 ```
 
-**O que procurar:** Renata aparece saindo do corredor de armazenamento com uma caixa de equipamentos às 19:48. Ela afirmou que não entrou no depósito depois das 19:00.
+5. Compare com o depoimento:
 
-**Conceitos praticados:** `SELECT`, `FROM`, `WHERE` e `AND`.
+```sql
+SELECT *
+FROM interviews
+WHERE suspect_id = 4;
+```
 
-## Caso #003 — A fraude no leilão
+**O que observar:** Renata aparece saindo do corredor de armazenamento com uma caixa de equipamentos às 19:48. Ela afirmou que não entrou no depósito depois das 19:00.
+
+**Conceitos praticados:** comparação com `>=`, filtros com `WHERE` e combinação de condições com `AND`.
+
+## Caso #003 — A Fraude no Leilão
 
 **Principal responsável identificado: Clara Nunes (ID 3), intermediária.**
 
-Neste nível, as informações estão em tabelas diferentes. O jogador precisa aprender a relacioná-las usando `JOIN`.
+### Progressão
 
-### Como chegar à resposta
+1. Consulte os lances:
 
-Primeiro, encontre os pagamentos rejeitados:
+```sql
+SELECT *
+FROM bids;
+```
+
+2. Encontre lances de 5.000 ou mais:
+
+```sql
+SELECT suspect_id, amount
+FROM bids
+WHERE amount >= 5000;
+```
+
+3. Localize o pagamento rejeitado:
 
 ```sql
 SELECT *
@@ -73,16 +130,18 @@ FROM payments
 WHERE status = 'REJECTED';
 ```
 
-O resultado indica que o pagamento rejeitado está associado ao lance de ID 2. Agora, relacione os pagamentos aos lances para descobrir quem fez esse lance:
+Observe que `payments.bid_id` guarda o identificador do lance relacionado.
+
+4. Relacione lances e pagamentos com `JOIN`:
 
 ```sql
-SELECT bids.suspect_id, bids.amount, payments.status
+SELECT bids.suspect_id, payments.status
 FROM bids
 JOIN payments ON payments.bid_id = bids.id
 WHERE payments.status = 'REJECTED';
 ```
 
-O resultado aponta para o suspeito de ID 3. Consulte a tabela `suspects` para identificar a pessoa:
+5. Descubra o nome do participante:
 
 ```sql
 SELECT *
@@ -90,18 +149,18 @@ FROM suspects
 WHERE id = 3;
 ```
 
-**O que procurar:** Clara fez o lance de 6.500 pela obra *Noite Azul*. O pagamento associado ao lance foi rejeitado e está registrado em nome de outra pessoa (ID 1), Ana Ribeiro. Essa divergência é o principal indício da fraude.
+**O que observar:** o pagamento rejeitado está ligado ao lance de ID 2, realizado pelo suspeito de ID 3. O pagamento aparece associado a outra pessoa (ID 1), Ana Ribeiro. A divergência é o principal indício da fraude.
 
-**Conceitos praticados:** filtros com `WHERE`, relacionamento entre tabelas e `JOIN ... ON`.
+**Conceitos praticados:** filtros, comparações, chaves relacionadas, `JOIN` e `ON`.
 
 ---
 
 ## Progressão de aprendizagem
 
-| Caso | Habilidade principal | Complexidade |
+| Caso | Conteúdo novo | Objetivo pedagógico |
 |---|---|---|
-| #001 | Consultar uma tabela e filtrar por um suspeito | Inicial |
-| #002 | Combinar condições com `AND` para encontrar registros | Básica |
-| #003 | Relacionar tabelas com `JOIN` e interpretar resultados | Intermediária |
+| #001 | `SELECT`, `FROM`, seleção de colunas e `WHERE` | Aprender a consultar uma tabela e filtrar por igualdade |
+| #002 | `>=` e `AND` | Comparar valores e combinar condições |
+| #003 | `JOIN` e `ON` | Relacionar dados de tabelas diferentes |
 
-As consultas foram mantidas curtas de propósito. A investigação deve evoluir junto com os conceitos ensinados, sem exigir `JOIN` antes de ele ser apresentado ao jogador.
+Cada caso reaproveita conceitos anteriores e introduz poucos elementos novos por vez. O aluno continua montando todas as consultas com blocos; a interface não exige digitação de SQL.

@@ -4,9 +4,4 @@ export const menuOptions = [
     to: '/cases',
     primary: true,
   },
-  {
-    label: 'COMO JOGAR',
-    to: '/how-to-play',
-    primary: false,
-  },
 ]

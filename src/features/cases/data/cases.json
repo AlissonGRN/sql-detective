@@ -6,9 +6,11 @@
     "difficulty": "Iniciante",
     "description": "Uma valiosa pintura desapareceu durante a noite no Museu Bellmont.",
     "concepts": [
+      "Tabelas, registros e colunas",
       "SELECT",
       "FROM",
-      "WHERE"
+      "WHERE",
+      "Filtro por igualdade"
     ],
     "available": true,
     "briefing": {
@@ -17,21 +19,113 @@
       "location": "Museu Bellmont",
       "crime": "Roubo de obra de arte",
       "time": "20:30 — 20:50",
-      "speech": "Temos um problema no Museu Bellmont. A pintura Paisagem de Outono desapareceu durante a noite. Funcionários, visitantes e prestadores ainda estavam no prédio. Os registros digitais do museu estão à sua disposição. Descubra quem levou a obra.",
-      "mission": "Consulte os registros digitais do Museu Bellmont utilizando SQL, analise as informações retornadas e identifique quem foi responsável pelo roubo."
+      "speech": "Uma pintura desapareceu do Museu Bellmont. Temos uma lista de funcionários, registros de câmeras e depoimentos. Vamos consultar os dados passo a passo para descobrir quem mentiu sobre sua presença na sala.",
+      "mission": "Conheça os funcionários, aprenda a escolher informações com SELECT e use WHERE para localizar registros. Depois compare a câmera e o depoimento."
     },
     "gameplay": {
       "guide": {
         "npcName": "Inspetor Duarte",
         "steps": [
           {
-            "id": "presence",
-            "title": "Quem permaneceu no museu?",
-            "message": "Primeiro precisamos descobrir quem ainda estava no prédio durante o horário do crime.",
-            "objective": "Identifique as pessoas que permaneceram no museu depois das 20:30.",
-            "suggestedTable": "visits",
+            "id": "discover-suspects",
+            "title": "Conheça as pessoas ligadas ao museu",
+            "message": "Comece consultando todos os registros da tabela suspects.",
+            "objective": "Consulte a tabela de suspeitos para ver todas as pessoas registradas.",
+            "concept": "SELECT e FROM",
+            "explanation": "SELECT escolhe o que será exibido. FROM indica de qual tabela vêm os dados. O bloco * representa todas as colunas.",
+            "suggestedTable": "suspects",
             "requiredTables": [
-              "visits"
+              "suspects"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM"
+              ],
+              "tables": [
+                "suspects"
+              ],
+              "columns": [
+                "*"
+              ],
+              "operators": [],
+              "values": [],
+              "symbols": []
+            },
+            "validation": {
+              "requiredKeywords": [
+                "FROM"
+              ],
+              "requiredSelectItems": [
+                "*"
+              ],
+              "column": "id",
+              "expectedValues": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+              ]
+            }
+          },
+          {
+            "id": "choose-columns",
+            "title": "Mostre apenas as informações importantes",
+            "message": "Agora escolha as colunas que respondem à pergunta. Não é necessário exibir todos os dados.",
+            "objective": "Consulte somente o nome e a profissão de cada pessoa.",
+            "concept": "Escolher colunas",
+            "explanation": "Em vez de usar *, selecione apenas as colunas necessárias. A vírgula separa uma coluna da outra.",
+            "suggestedTable": "suspects",
+            "requiredTables": [
+              "suspects"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM"
+              ],
+              "tables": [
+                "suspects"
+              ],
+              "columns": [
+                "name",
+                "occupation"
+              ],
+              "operators": [],
+              "values": [],
+              "symbols": [
+                ","
+              ]
+            },
+            "validation": {
+              "requiredKeywords": [
+                "FROM"
+              ],
+              "requiredSelectItems": [
+                "name",
+                "occupation"
+              ],
+              "expectedColumns": [
+                "name",
+                "occupation"
+              ],
+              "expectedRowCount": 8
+            }
+          },
+          {
+            "id": "filter-security",
+            "title": "Encontre quem trabalha na segurança",
+            "message": "Use WHERE para encontrar apenas o registro cuja profissão é Segurança.",
+            "objective": "Filtre a tabela de suspeitos para encontrar a pessoa cuja profissão é Segurança.",
+            "concept": "WHERE com igualdade",
+            "explanation": "WHERE filtra as linhas. Use = para encontrar um valor exato. Textos precisam ficar entre aspas simples.",
+            "suggestedTable": "suspects",
+            "requiredTables": [
+              "suspects"
             ],
             "sqlPalette": {
               "keywords": [
@@ -40,91 +134,83 @@
                 "WHERE"
               ],
               "tables": [
-                "visits"
+                "suspects"
               ],
               "columns": [
                 "*",
-                "visits.suspect_id",
-                "visits.entry_time",
-                "visits.exit_time"
+                "occupation",
+                "id"
               ],
               "operators": [
-                ">="
+                "="
               ],
               "values": [
-                "'20:30'"
-              ]
+                "'Segurança'"
+              ],
+              "symbols": []
             },
             "validation": {
-              "column": "suspect_id",
-              "expectedValues": [
-                1,
-                2,
-                3,
-                5
+              "requiredKeywords": [
+                "WHERE"
               ],
-              "requireWhere": true
+              "column": "id",
+              "expectedValues": [
+                2
+              ]
             }
           },
           {
-            "id": "access",
-            "title": "Quem acessou a Sala Bellmont?",
-            "message": "Algumas pessoas ainda estavam no museu. Agora precisamos descobrir quem teve acesso à sala do quadro.",
-            "objective": "Investigue os registros de acesso relacionados à Sala Bellmont.",
-            "suggestedTable": "access_logs",
+            "id": "check-camera",
+            "title": "Confira o registro da câmera",
+            "message": "Aplique o mesmo tipo de filtro à tabela camera_logs.",
+            "objective": "Consulte os registros de câmera associados ao suspeito de ID 2.",
+            "concept": "Reutilizando WHERE",
+            "explanation": "O mesmo filtro pode ser usado em outras tabelas. Agora procure os registros da câmera pelo identificador do suspeito.",
+            "suggestedTable": "camera_logs",
             "requiredTables": [
-              "access_logs"
+              "camera_logs"
             ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
                 "FROM",
-                "WHERE",
-                "AND"
+                "WHERE"
               ],
               "tables": [
-                "visits",
-                "rooms",
-                "access_logs"
+                "camera_logs"
               ],
               "columns": [
                 "*",
-                "rooms.id",
-                "rooms.name",
-                "access_logs.suspect_id",
-                "access_logs.room_id",
-                "access_logs.time",
-                "access_logs.time"
+                "suspect_id"
               ],
               "operators": [
-                "=",
-                ">=",
-                "<="
+                "="
               ],
               "values": [
-                "4",
-                "'Sala Bellmont'",
-                "'20:30'",
-                "'20:50'"
-              ]
+                "2"
+              ],
+              "symbols": []
             },
             "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
               "column": "suspect_id",
               "expectedValues": [
-                1,
                 2
               ],
-              "requireWhere": true
+              "expectedRowCount": 2
             }
           },
           {
-            "id": "contradiction",
-            "title": "Os registros contam a mesma história?",
-            "message": "Temos pessoas próximas à sala. Agora compare as câmeras com os depoimentos e procure contradições.",
-            "objective": "Consulte os registros das câmeras e os depoimentos dos suspeitos.",
-            "suggestedTable": "camera_logs",
+            "id": "check-interview",
+            "title": "Compare com o depoimento",
+            "message": "Consulte o depoimento da mesma pessoa e compare com o que a câmera registrou.",
+            "objective": "Consulte o depoimento associado ao suspeito de ID 2.",
+            "concept": "Consultar outra tabela",
+            "explanation": "As informações de uma investigação ficam distribuídas em tabelas diferentes. Use o identificador para localizar o depoimento correspondente.",
+            "suggestedTable": "interviews",
             "requiredTables": [
-              "camera_logs",
               "interviews"
             ],
             "sqlPalette": {
@@ -134,99 +220,53 @@
                 "WHERE"
               ],
               "tables": [
-                "visits",
-                "rooms",
-                "access_logs",
-                "camera_logs",
-                "interviews",
-                "suspects"
+                "interviews"
               ],
               "columns": [
                 "*",
-                "suspects.id",
-                "suspects.name",
-                "camera_logs.suspect_id",
-                "camera_logs.room_id",
-                "camera_logs.time",
-                "camera_logs.event",
-                "interviews.suspect_id",
-                "interviews.statement"
+                "suspect_id"
               ],
               "operators": [
-                "=",
-                ">=",
-                "<="
+                "="
               ],
               "values": [
-                "1",
-                "2",
-                "3",
-                "5",
-                "4",
-                "'20:30'",
-                "'20:50'",
-                "'20:36'",
-                "'20:39'"
-              ]
+                "2"
+              ],
+              "symbols": []
             },
             "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
               "column": "suspect_id",
               "expectedValues": [
                 2
               ],
-              "requireWhere": true
+              "expectedRowCount": 1
             }
           },
           {
             "id": "accusation",
-            "title": "Hora de apresentar sua conclusão",
-            "message": "Você já consultou os principais registros da investigação. Analise tudo o que encontrou antes de fazer sua acusação.",
-            "objective": "Escolha quem você considera responsável pelo desaparecimento da obra.",
+            "title": "Apresente sua conclusão",
+            "message": "Você consultou os registros da pessoa, da câmera e do depoimento. Use essas informações para apresentar sua conclusão.",
+            "objective": "Escolha quem você considera responsável pelo desaparecimento da pintura.",
+            "concept": "Conclusão da investigação",
+            "explanation": "Revise as evidências que você consultou. Escolha a pessoa cuja versão é contrariada pelos registros.",
             "requiredTables": [],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
-                "FROM",
-                "WHERE"
+                "FROM"
               ],
               "tables": [
-                "visits",
-                "rooms",
-                "access_logs",
-                "camera_logs",
-                "interviews",
                 "suspects"
               ],
               "columns": [
-                "*",
-                "suspects.id",
-                "suspects.name",
-                "suspects.occupation",
-                "visits.suspect_id",
-                "visits.exit_time",
-                "access_logs.suspect_id",
-                "access_logs.room_id",
-                "access_logs.time",
-                "camera_logs.suspect_id",
-                "camera_logs.time",
-                "camera_logs.event",
-                "interviews.suspect_id",
-                "interviews.statement"
+                "*"
               ],
-              "operators": [
-                "=",
-                ">=",
-                "<="
-              ],
-              "values": [
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "'20:30'",
-                "'20:50'"
-              ]
+              "operators": [],
+              "values": [],
+              "symbols": []
             }
           }
         ]
@@ -240,10 +280,10 @@
     "difficulty": "Básico",
     "description": "Um robô experimental desapareceu de um depósito restrito no Centro Atlas.",
     "concepts": [
-      "SELECT",
-      "FROM",
       "WHERE",
-      "AND"
+      "Comparações com >=",
+      "AND",
+      "Leitura de resultados"
     ],
     "available": true,
     "briefing": {
@@ -252,18 +292,20 @@
       "location": "Centro Atlas",
       "crime": "Desaparecimento de protótipo tecnológico",
       "time": "19:00 — 20:00",
-      "speech": "O protótipo de robótica do Centro Atlas desapareceu do depósito na noite anterior à sua apresentação. O acesso é restrito, mas vários funcionários e visitantes estavam no prédio. Verifique os registros e descubra quem retirou o equipamento.",
-      "mission": "Investigue horários, acessos, câmeras e depoimentos por meio de SQL para identificar o responsável."
+      "speech": "Um protótipo desapareceu do Centro Atlas. Alguns funcionários estavam no prédio, mas apenas parte deles acessou o depósito. Use os horários e os registros de acesso para descobrir quem contradisse o próprio depoimento.",
+      "mission": "Pratique comparações de horário e combine condições com AND. Depois confira os registros de câmera e o depoimento de quem esteve no depósito."
     },
     "gameplay": {
       "guide": {
         "npcName": "Inspetor Duarte",
         "steps": [
           {
-            "id": "presence",
-            "title": "Quem ficou após o fechamento?",
-            "message": "O protótipo desapareceu entre 19:00 e 20:00. Descubra quem ainda estava no Centro Atlas após as 19:00.",
-            "objective": "Encontre os IDs de quem saiu a partir das 19:00.",
+            "id": "after-hours",
+            "title": "Quem ainda estava no prédio depois das 19h?",
+            "message": "Filtre os horários de saída para encontrar quem permaneceu no prédio depois das 19h.",
+            "objective": "Encontre os identificadores das pessoas que saíram às 19:00 ou depois.",
+            "concept": "Comparar valores com >=",
+            "explanation": "O operador >= significa maior ou igual. Como os horários estão no formato HH:MM, compare o horário com o limite informado.",
             "suggestedTable": "visits",
             "requiredTables": [
               "visits"
@@ -278,33 +320,84 @@
                 "visits"
               ],
               "columns": [
-                "*",
-                "visits.suspect_id",
-                "visits.exit_time"
+                "suspect_id",
+                "exit_time"
               ],
               "operators": [
                 ">="
               ],
               "values": [
                 "'19:00'"
+              ],
+              "symbols": [
+                ","
               ]
             },
             "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
               "column": "suspect_id",
               "expectedValues": [
                 1,
                 2,
                 4,
                 5
-              ],
-              "requireWhere": true
+              ]
             }
           },
           {
-            "id": "access",
-            "title": "Quem entrou no depósito?",
-            "message": "Agora precisamos saber quem utilizou o crachá no Depósito de Protótipos após as 19:00.",
-            "objective": "Identifique os crachás que abriram a sala restrita no horário do crime.",
+            "id": "depot-access",
+            "title": "Quem usou o crachá do depósito?",
+            "message": "Encontre os acessos feitos à sala de ID 3. Ainda não use o horário como filtro.",
+            "objective": "Consulte os acessos feitos à sala de ID 3, que corresponde ao Depósito de Protótipos.",
+            "concept": "Filtro por igualdade",
+            "explanation": "Use WHERE com = para localizar os registros de uma sala específica. Observe que mais de uma pessoa pode aparecer.",
+            "suggestedTable": "access_logs",
+            "requiredTables": [
+              "access_logs"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "access_logs"
+              ],
+              "columns": [
+                "*",
+                "room_id",
+                "suspect_id"
+              ],
+              "operators": [
+                "="
+              ],
+              "values": [
+                "3"
+              ],
+              "symbols": []
+            },
+            "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
+              "column": "suspect_id",
+              "expectedValues": [
+                2,
+                4,
+                5
+              ]
+            }
+          },
+          {
+            "id": "depot-after-hours",
+            "title": "Quem acessou o depósito depois das 19h?",
+            "message": "Agora combine o local e o horário. Os dois filtros precisam ser verdadeiros.",
+            "objective": "Combine a sala correta com o horário para deixar somente os acessos relevantes.",
+            "concept": "Combinar condições com AND",
+            "explanation": "AND exige que as duas condições sejam verdadeiras. Use room_id = 3 e time >= '19:00' na mesma consulta.",
             "suggestedTable": "access_logs",
             "requiredTables": [
               "access_logs"
@@ -317,17 +410,12 @@
                 "AND"
               ],
               "tables": [
-                "rooms",
-                "access_logs",
-                "visits"
+                "access_logs"
               ],
               "columns": [
-                "*",
-                "rooms.id",
-                "rooms.name",
-                "access_logs.suspect_id",
-                "access_logs.room_id",
-                "access_logs.time"
+                "suspect_id",
+                "room_id",
+                "time"
               ],
               "operators": [
                 "=",
@@ -336,25 +424,75 @@
               "values": [
                 "3",
                 "'19:00'"
+              ],
+              "symbols": [
+                ","
               ]
             },
             "validation": {
+              "requiredKeywords": [
+                "WHERE",
+                "AND"
+              ],
               "column": "suspect_id",
               "expectedValues": [
                 2,
                 4
-              ],
-              "requireWhere": true
+              ]
             }
           },
           {
-            "id": "contradiction",
-            "title": "Quem está mentindo?",
-            "message": "Dois crachás abriram o depósito. Compare os movimentos gravados com os depoimentos e identifique as contradições.",
-            "objective": "Consulte câmeras e entrevistas para identificar quem mentiu sobre sua presença no depósito.",
+            "id": "camera-renata",
+            "title": "Confira o que a câmera registrou",
+            "message": "Consulte as câmeras para verificar o que a pessoa fez no depósito.",
+            "objective": "Consulte os registros de câmera associados ao suspeito de ID 4.",
+            "concept": "Aplicar filtros aos registros",
+            "explanation": "Use o identificador encontrado para consultar outra tabela. Observe os horários e a descrição dos eventos.",
             "suggestedTable": "camera_logs",
             "requiredTables": [
-              "camera_logs",
+              "camera_logs"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "camera_logs"
+              ],
+              "columns": [
+                "*",
+                "suspect_id"
+              ],
+              "operators": [
+                "="
+              ],
+              "values": [
+                "4"
+              ],
+              "symbols": []
+            },
+            "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
+              "column": "suspect_id",
+              "expectedValues": [
+                4
+              ],
+              "expectedRowCount": 2
+            }
+          },
+          {
+            "id": "interview-renata",
+            "title": "Compare com o depoimento",
+            "message": "Leia o depoimento e compare com o registro da câmera.",
+            "objective": "Leia o depoimento associado ao suspeito de ID 4.",
+            "concept": "Cruzar evidências",
+            "explanation": "Compare o que a pessoa declarou com o evento registrado pela câmera. A consulta ajuda a localizar a evidência; a interpretação é sua.",
+            "suggestedTable": "interviews",
+            "requiredTables": [
               "interviews"
             ],
             "sqlPalette": {
@@ -364,84 +502,53 @@
                 "WHERE"
               ],
               "tables": [
-                "visits",
-                "rooms",
-                "access_logs",
-                "camera_logs",
-                "interviews",
-                "suspects"
+                "interviews"
               ],
               "columns": [
                 "*",
-                "camera_logs.suspect_id",
-                "camera_logs.time",
-                "camera_logs.event",
-                "interviews.suspect_id",
-                "interviews.statement",
-                "suspects.id",
-                "suspects.name"
+                "suspect_id"
               ],
               "operators": [
                 "="
               ],
               "values": [
-                "2",
                 "4"
-              ]
+              ],
+              "symbols": []
             },
             "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
               "column": "suspect_id",
               "expectedValues": [
                 4
               ],
-              "requireWhere": true
+              "expectedRowCount": 1
             }
           },
           {
             "id": "accusation",
             "title": "Apresente sua conclusão",
-            "message": "Os registros já permitem uma conclusão. Analise quem mentiu e formalize a acusação.",
-            "objective": "Abra Analisar Suspeitos e escolha o responsável pelo desaparecimento.",
+            "message": "Os registros de acesso, as câmeras e o depoimento permitem avaliar quem contou uma versão incompatível com os dados.",
+            "objective": "Escolha quem retirou o protótipo do depósito.",
+            "concept": "Conclusão da investigação",
+            "explanation": "Revise as evidências que você consultou. Escolha a pessoa cuja versão é contrariada pelos registros.",
             "requiredTables": [],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
-                "FROM",
-                "WHERE"
+                "FROM"
               ],
               "tables": [
-                "visits",
-                "rooms",
-                "access_logs",
-                "camera_logs",
-                "interviews",
                 "suspects"
               ],
               "columns": [
-                "*",
-                "suspects.id",
-                "suspects.name",
-                "visits.suspect_id",
-                "visits.exit_time",
-                "access_logs.suspect_id",
-                "access_logs.room_id",
-                "access_logs.time",
-                "camera_logs.suspect_id",
-                "camera_logs.time",
-                "camera_logs.event",
-                "interviews.suspect_id",
-                "interviews.statement"
+                "*"
               ],
-              "operators": [
-                "=",
-                ">="
-              ],
-              "values": [
-                "2",
-                "3",
-                "4",
-                "'19:00'"
-              ]
+              "operators": [],
+              "values": [],
+              "symbols": []
             }
           }
         ]
@@ -456,9 +563,9 @@
     "description": "Uma venda suspeita no leilão do Museu Bellmont esconde uma fraude nos pagamentos.",
     "concepts": [
       "SELECT e WHERE",
-      "JOIN",
+      "Comparações",
       "Relacionamento entre tabelas",
-      "Análise de evidências"
+      "JOIN e ON"
     ],
     "available": true,
     "briefing": {
@@ -467,21 +574,23 @@
       "location": "Casa de Leilões Bellmont",
       "crime": "Fraude em leilão e pagamento suspeito",
       "time": "18:00 — 19:30",
-      "speech": "Uma obra foi arrematada por um valor alto, mas o pagamento foi rejeitado e os dados do pagador não correspondem ao lance. Precisamos descobrir quem participou da fraude. Os registros estão separados em tabelas relacionadas: conecte as informações antes de tirar conclusões.",
-      "mission": "Investigue as obras, os lances e os pagamentos. Use JOIN para relacionar tabelas e identifique quem fez o lance ligado ao pagamento suspeito."
+      "speech": "Uma obra foi arrematada por um valor alto, mas o pagamento foi rejeitado e os dados do pagador não correspondem ao lance. Primeiro consulte cada tabela separadamente. Depois, relacione os registros para identificar quem fez o lance suspeito.",
+      "mission": "Analise os lances e os pagamentos separadamente. Quando compreender os identificadores, use JOIN e ON para relacionar as duas tabelas."
     },
     "gameplay": {
       "guide": {
         "npcName": "Inspetor Duarte",
         "steps": [
           {
-            "id": "artworks",
-            "title": "Quais obras estavam no leilão?",
-            "message": "Comece conhecendo as obras e os valores de reserva registrados.",
-            "objective": "Consulte os registros de obras para saber quais itens foram leiloados.",
-            "suggestedTable": "artworks",
+            "id": "view-bids",
+            "title": "Conheça os lances do leilão",
+            "message": "Comece observando os registros da tabela bids.",
+            "objective": "Consulte todos os lances registrados e observe os identificadores e valores.",
+            "concept": "Revisão de SELECT e FROM",
+            "explanation": "Antes de relacionar tabelas, conheça os dados de bids. Observe as colunas id, suspect_id e amount.",
+            "suggestedTable": "bids",
             "requiredTables": [
-              "artworks"
+              "bids"
             ],
             "sqlPalette": {
               "keywords": [
@@ -489,29 +598,37 @@
                 "FROM"
               ],
               "tables": [
-                "artworks"
+                "bids"
               ],
               "columns": [
-                "*",
-                "artworks.id",
-                "artworks.title",
-                "artworks.reserve_price"
+                "*"
               ],
-              "operators": [
-                ">=",
-                "="
+              "operators": [],
+              "values": [],
+              "symbols": []
+            },
+            "validation": {
+              "requiredKeywords": [
+                "FROM"
               ],
-              "values": [
-                "3000",
-                "5000"
+              "requiredSelectItems": [
+                "*"
+              ],
+              "column": "id",
+              "expectedValues": [
+                1,
+                2,
+                3
               ]
             }
           },
           {
-            "id": "bids",
-            "title": "Quais lances merecem atenção?",
-            "message": "Compare os valores dos lances com os valores de reserva das obras.",
-            "objective": "Encontre os lances de valor alto e observe os identificadores dos participantes.",
+            "id": "filter-bids",
+            "title": "Encontre os lances de valor alto",
+            "message": "Filtre os lances pelo valor e observe os IDs dos participantes.",
+            "objective": "Mostre os lances com valor igual ou superior a 5.000 e observe quem os realizou.",
+            "concept": "WHERE com comparação",
+            "explanation": "Use WHERE para filtrar os valores. O operador >= inclui o próprio limite informado.",
             "suggestedTable": "bids",
             "requiredTables": [
               "bids"
@@ -526,95 +643,85 @@
                 "bids"
               ],
               "columns": [
-                "*",
-                "bids.id",
-                "bids.suspect_id",
-                "bids.artwork_id",
-                "bids.amount"
+                "suspect_id",
+                "amount"
               ],
               "operators": [
-                ">=",
-                "="
+                ">="
               ],
               "values": [
-                "5000",
-                "6000"
+                "5000"
+              ],
+              "symbols": [
+                ","
               ]
             },
             "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
               "column": "suspect_id",
               "expectedValues": [
                 2,
                 3
-              ],
-              "requireWhere": true
+              ]
             }
           },
           {
-            "id": "payments",
-            "title": "Quem está ligado ao pagamento rejeitado?",
-            "message": "Um lance alto está ligado a um pagamento rejeitado. Relacione as tabelas para encontrar quem fez o lance e compare com os dados do pagador.",
-            "objective": "Use JOIN entre bids e payments para localizar o lance com pagamento rejeitado. Você também pode relacionar suspects para identificar a pessoa.",
+            "id": "find-rejected-payment",
+            "title": "Localize o pagamento rejeitado",
+            "message": "Encontre o pagamento rejeitado e observe o valor de bid_id.",
+            "objective": "Consulte a tabela de pagamentos e encontre o registro com status REJECTED.",
+            "concept": "Preparar o relacionamento",
+            "explanation": "Observe a coluna bid_id. Ela guarda o ID do lance relacionado a cada pagamento. Essa informação será usada para conectar as tabelas.",
             "suggestedTable": "payments",
             "requiredTables": [
-              "bids",
               "payments"
             ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
                 "FROM",
-                "JOIN",
-                "ON",
-                "WHERE",
-                "AND"
+                "WHERE"
               ],
               "tables": [
-                "bids",
-                "payments",
-                "suspects",
-                "artworks"
+                "payments"
               ],
               "columns": [
                 "*",
-                "bids.id",
-                "bids.suspect_id",
-                "bids.artwork_id",
-                "bids.amount",
-                "payments.bid_id",
-                "payments.payer_id",
-                "payments.amount",
-                "payments.status",
-                "suspects.id",
-                "suspects.name"
+                "status",
+                "bid_id"
               ],
               "operators": [
-                "=",
-                "!=",
-                "<>",
-                ">="
+                "="
               ],
               "values": [
-                "3",
-                "'REJECTED'",
-                "'CONFIRMED'",
-                "5000"
-              ]
+                "'REJECTED'"
+              ],
+              "symbols": []
             },
             "validation": {
-              "column": "suspect_id",
-              "expectedValues": [
-                3
+              "requiredKeywords": [
+                "WHERE"
               ],
-              "requireWhere": true
+              "column": "id",
+              "expectedValues": [
+                2
+              ],
+              "expectedRowCount": 1
             }
           },
           {
-            "id": "accusation",
-            "title": "Apresente sua conclusão",
-            "message": "Use os registros relacionados para explicar quem fez o lance suspeito e por que o pagamento não confere.",
-            "objective": "Abra Analisar Suspeitos e selecione quem está ligado ao lance fraudulento.",
-            "requiredTables": [],
+            "id": "join-bids-payments",
+            "title": "Relacione o lance ao pagamento",
+            "message": "Monte a consulta relacionando bids e payments. Não esqueça de informar a conexão depois de ON.",
+            "objective": "Use JOIN para combinar bids e payments. Relacione payments.bid_id com bids.id e filtre o pagamento rejeitado.",
+            "concept": "JOIN e ON",
+            "explanation": "JOIN combina tabelas. ON informa quais colunas representam a mesma relação. Neste caso, payments.bid_id corresponde a bids.id.",
+            "suggestedTable": "bids",
+            "requiredTables": [
+              "bids"
+            ],
             "sqlPalette": {
               "keywords": [
                 "SELECT",
@@ -625,26 +732,105 @@
               ],
               "tables": [
                 "bids",
-                "payments",
-                "suspects",
-                "artworks"
+                "payments"
+              ],
+              "columns": [
+                "bids.suspect_id",
+                "payments.status",
+                "payments.bid_id",
+                "bids.id"
+              ],
+              "operators": [
+                "="
+              ],
+              "values": [
+                "'REJECTED'"
+              ],
+              "symbols": [
+                ","
+              ]
+            },
+            "validation": {
+              "requiredKeywords": [
+                "JOIN",
+                "ON",
+                "WHERE"
+              ],
+              "requiredSelectItems": [
+                "bids.suspect_id",
+                "payments.status"
+              ],
+              "column": "suspect_id",
+              "expectedValues": [
+                3
+              ]
+            }
+          },
+          {
+            "id": "identify-bidder",
+            "title": "Descubra o nome do participante",
+            "message": "Consulte a tabela suspects para transformar o identificador em um nome.",
+            "objective": "Use o ID 3 encontrado na consulta para localizar o nome da pessoa na tabela suspects.",
+            "concept": "Aplicar o conhecimento em outra tabela",
+            "explanation": "Você já encontrou o identificador do participante. Agora use WHERE para localizar o registro correspondente.",
+            "suggestedTable": "suspects",
+            "requiredTables": [
+              "suspects"
+            ],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM",
+                "WHERE"
+              ],
+              "tables": [
+                "suspects"
               ],
               "columns": [
                 "*",
-                "bids.suspect_id",
-                "bids.amount",
-                "payments.payer_id",
-                "payments.status",
-                "suspects.name"
+                "id"
               ],
               "operators": [
-                "=",
-                "!="
+                "="
               ],
               "values": [
-                "3",
-                "'REJECTED'"
-              ]
+                "3"
+              ],
+              "symbols": []
+            },
+            "validation": {
+              "requiredKeywords": [
+                "WHERE"
+              ],
+              "column": "id",
+              "expectedValues": [
+                3
+              ],
+              "expectedRowCount": 1
+            }
+          },
+          {
+            "id": "accusation",
+            "title": "Apresente sua conclusão",
+            "message": "Você relacionou o lance ao pagamento rejeitado e identificou o participante. Apresente sua conclusão.",
+            "objective": "Escolha quem participou da fraude no leilão.",
+            "concept": "Conclusão da investigação",
+            "explanation": "Revise as evidências que você consultou. Escolha a pessoa cuja versão é contrariada pelos registros.",
+            "requiredTables": [],
+            "sqlPalette": {
+              "keywords": [
+                "SELECT",
+                "FROM"
+              ],
+              "tables": [
+                "suspects"
+              ],
+              "columns": [
+                "*"
+              ],
+              "operators": [],
+              "values": [],
+              "symbols": []
             }
           }
         ]

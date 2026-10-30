@@ -1,114 +1,44 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { useState } from 'react'
+import { Navigate, useNavigate, useParams } from 'react-router'
 
-import {
-  Navigate,
-  useNavigate,
-  useParams,
-} from 'react-router'
-
-import type {
-  GameCase,
-} from '../../cases/types/case'
-
-import {
-  getCaseById,
-} from '../../cases/services/caseService'
-
+import type { GameCase } from '../../cases/types/case'
+import { getCaseById } from '../../cases/services/caseService'
 import { AccusationResultModal } from '../components/AccusationResultModal'
 import { DatabaseExplorer } from '../components/DatabaseExplorer'
 import { GameHeader } from '../components/GameHeader'
 import { GameplayTutorial } from '../components/GameplayTutorial'
-import { InvestigationGuide } from '../components/InvestigationGuide'
 import { QueryResults } from '../components/QueryResults'
 import { SqlBuilder } from '../components/SqlBuilder/SqlBuilder'
 import { SuspectModal } from '../components/SuspectModal'
-
-import {
-  useInvestigationProgress,
-} from '../hooks/useInvestigationProgress'
-
-import {
-  useScenarioDatabase,
-} from '../hooks/useScenarioDatabase'
-
-import {
-  executeSelectQuery,
-} from '../services/sqlEngine'
-
+import { useInvestigationProgress } from '../hooks/useInvestigationProgress'
+import { useScenarioDatabase } from '../hooks/useScenarioDatabase'
+import { executeSelectQuery } from '../services/sqlEngine'
 import { evaluateInvestigationQuery } from '../services/investigationValidation'
+import { getFriendlySqlError } from '../services/sqlErrorService'
+import { getInitialScenarioForCase } from '../services/scenarioService'
+import { getSolutionByScenarioId } from '../services/solutionService'
 
-import {
-  getFriendlySqlError,
-} from '../services/sqlErrorService'
-
-import {
-  getInitialScenarioForCase,
-} from '../services/scenarioService'
-
-import {
-  getSolutionByScenarioId,
-} from '../services/solutionService'
-
-import type {
-  GameScenario,
-} from '../types/database'
-
-import type {
-  SqlQueryResult,
-} from '../types/query'
+import type { GameScenario } from '../types/database'
+import type { SqlQueryResult } from '../types/query'
 
 interface AccusationResult {
   correct: boolean
-
   suspectName: string
-
   explanation?: string
   evidence?: string[]
 }
 
+const tutorialStorageKey = 'sql-detective-learning-guide-v2'
+
 export function GameplayPage() {
-  const {
-    caseId,
-  } = useParams<{
-    caseId: string
-  }>()
+  const { caseId } = useParams<{ caseId: string }>()
+  if (!caseId) return <Navigate to="/cases" replace />
 
-  if (!caseId) {
-    return (
-      <Navigate
-        to="/cases"
-        replace
-      />
-    )
-  }
+  const gameCase = getCaseById(caseId)
+  const scenario = getInitialScenarioForCase(caseId)
+  if (!gameCase || !scenario) return <Navigate to="/cases" replace />
 
-  const gameCase =
-    getCaseById(caseId)
-
-  const scenario =
-    getInitialScenarioForCase(
-      caseId,
-    )
-
-  if (!gameCase || !scenario) {
-    return (
-      <Navigate
-        to="/cases"
-        replace
-      />
-    )
-  }
-
-  return (
-    <GameplayContent
-      gameCase={gameCase}
-      scenario={scenario}
-    />
-  )
+  return <GameplayContent gameCase={gameCase} scenario={scenario} />
 }
 
 interface GameplayContentProps {
@@ -116,374 +46,199 @@ interface GameplayContentProps {
   scenario: GameScenario
 }
 
-function GameplayContent({
-  gameCase,
-  scenario,
-}: GameplayContentProps) {
+function GameplayContent({ gameCase, scenario }: GameplayContentProps) {
   const navigate = useNavigate()
   const [showTutorial, setShowTutorial] = useState(() => {
-    try { return localStorage.getItem('sql-detective-tutorial-completed') !== 'yes' } catch { return true }
-  })
-  const closeTutorial = () => {
-    setShowTutorial(false)
-    try { localStorage.setItem('sql-detective-tutorial-completed', 'yes') } catch { /* storage may be unavailable */ }
-  }
-  const [feedback, setFeedback] = useState<string | null>(null)
-  const resultsRef = useRef<HTMLDivElement>(null)
-
-  const [showDatabase, setShowDatabase] = useState(false)
-  const [showSqlCheatSheet, setShowSqlCheatSheet] = useState(false)
-  const [caseCompleted, setCaseCompleted] = useState(false)
-  const [
-    queryResult,
-    setQueryResult,
-  ] = useState<SqlQueryResult | null>(
-    null,
-  )
-
-  const [
-    queryError,
-    setQueryError,
-  ] = useState<string | null>(
-    null,
-  )
-
-  useEffect(() => {
-    if (queryResult || queryError) {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    try {
+      return localStorage.getItem(tutorialStorageKey) !== 'yes'
+    } catch {
+      return true
     }
-  }, [queryResult, queryError])
+  })
+  const [showDatabase, setShowDatabase] = useState(false)
+  const [feedback, setFeedback] = useState<string | null>(null)
+  const [caseCompleted, setCaseCompleted] = useState(false)
+  const [queryResult, setQueryResult] = useState<SqlQueryResult | null>(null)
+  const [queryError, setQueryError] = useState<string | null>(null)
+  const [isSuspectModalOpen, setIsSuspectModalOpen] = useState(false)
+  const [selectedCulpritId, setSelectedCulpritId] = useState<number | null>(null)
+  const [accusationResult, setAccusationResult] = useState<AccusationResult | null>(null)
 
-  const [
-    isSuspectModalOpen,
-    setIsSuspectModalOpen,
-  ] = useState(false)
-
-  const [
-    selectedCulpritId,
-    setSelectedCulpritId,
-  ] = useState<number | null>(
-    null,
-  )
-
-  const [
-    accusationResult,
-    setAccusationResult,
-  ] =
-    useState<AccusationResult | null>(
-      null,
-    )
-
-  const {
-    database,
-    isLoading:
-    isDatabaseLoading,
-    error: databaseError,
-  } = useScenarioDatabase(
-    scenario,
-  )
-
-  const tableNames = scenario.tables.map((table) => table.name)
-
-  const {
-    currentStep,
-    currentStepIndex,
-    consultedTables,
-
-    registerSuccessfulQuery,
-  } =
-    useInvestigationProgress({
-      scenarioId:
-        scenario.id,
-
-      guide:
-        gameCase.gameplay.guide,
-
-      tableNames,
-    })
+  const { database, isLoading: isDatabaseLoading, error: databaseError } = useScenarioDatabase(scenario)
+  const { currentStep, currentStepIndex, registerSuccessfulQuery } = useInvestigationProgress({
+    scenarioId: scenario.id,
+    guide: gameCase.gameplay.guide,
+    tableNames: scenario.tables.map(table => table.name),
+  })
 
   const canAccuse = currentStep?.id === 'accusation'
+  const suspectsTable = scenario.tables.find(table => table.name === 'suspects')
 
-  const suspectsTable =
-    scenario.tables.find(
-      (table) =>
-        table.name ===
-        'suspects',
-    )
+  const closeTutorial = () => {
+    setShowTutorial(false)
+    try {
+      localStorage.setItem(tutorialStorageKey, 'yes')
+    } catch {
+      // O guia continua acessível durante esta sessão.
+    }
+  }
 
-  const handleExecuteQuery = (
-    query: string,
-  ) => {
+  const handleExecuteQuery = (query: string) => {
     setQueryError(null)
     setQueryResult(null)
     setFeedback(null)
 
     if (!database) {
-      setQueryError(
-        'O banco de dados ainda está sendo preparado.',
-      )
-
+      setQueryError('O banco de dados ainda está sendo preparado.')
       return
     }
+    if (!currentStep || canAccuse) return
 
     try {
-      const result =
-        executeSelectQuery(
-          database,
-          query,
-        )
-
+      const result = executeSelectQuery(database, query)
       setQueryResult(result)
-
-      if (currentStep.id !== 'accusation') {
-        const evaluation = evaluateInvestigationQuery(currentStep, query, result)
-        setFeedback(evaluation.message)
-        if (evaluation.success && evaluation.consultedTables.length > 0) {
-          registerSuccessfulQuery(evaluation.consultedTables)
-        }
+      const evaluation = evaluateInvestigationQuery(currentStep, query, result)
+      setFeedback(evaluation.message)
+      if (evaluation.success && evaluation.consultedTables.length > 0) {
+        registerSuccessfulQuery(evaluation.consultedTables)
       }
     } catch (error: unknown) {
-      setQueryError(
-        getFriendlySqlError(
-          error,
-        ),
-      )
+      setQueryError(getFriendlySqlError(error))
     }
   }
 
-  const handleAccuse = (
-    suspectId: number,
-  ) => {
+  const handleAccuse = (suspectId: number) => {
     if (!canAccuse) return
-    setSelectedCulpritId(
-      suspectId,
-    )
+    setSelectedCulpritId(suspectId)
 
-    const solution =
-      getSolutionByScenarioId(
-        scenario.id,
-      )
+    const solution = getSolutionByScenarioId(scenario.id)
+    if (!solution || !suspectsTable) return
 
-    if (
-      !solution ||
-      !suspectsTable
-    ) {
-      return
-    }
-
-    const suspect =
-      suspectsTable.rows.find(
-        (row) =>
-          Number(row.id) ===
-          suspectId,
-      )
-
-    const suspectName =
-      String(
-        suspect?.name ??
-        'Suspeito',
-      )
-
-    const correct =
-      suspectId ===
-      solution.culpritId
-
+    const suspect = suspectsTable.rows.find(row => Number(row.id) === suspectId)
+    const suspectName = String(suspect?.name ?? 'Suspeito')
+    const correct = suspectId === solution.culpritId
     if (correct) setCaseCompleted(true)
 
     setAccusationResult({
       correct,
-
       suspectName,
-
       explanation: correct ? solution.explanation : undefined,
       evidence: correct ? solution.evidence : undefined,
     })
   }
 
-  if (!currentStep) {
-    return null
-  }
+  if (!currentStep) return null
+
+  const totalQuerySteps = Math.max(gameCase.gameplay.guide.steps.length - 1, 1)
+  const progress = Math.min(100, Math.round((currentStepIndex / totalQuerySteps) * 100))
 
   return (
-    <main
-      className="
-        min-h-screen
-        bg-[#151512]
-        px-5
-        py-6
-        text-[#e6dfcc]
-        md:px-8
-      "
-    >
-      <div
-        className="
-          mx-auto
-          max-w-[1550px]
-        "
-      >
+    <main className="min-h-screen bg-[#151512] px-4 py-5 text-[#e6dfcc] sm:px-6 md:px-8">
+      <div className="mx-auto max-w-5xl">
         <GameHeader
-          caseNumber={
-            gameCase.number
-          }
-          caseTitle={
-            gameCase.title
-          }
+          caseNumber={gameCase.number}
+          caseTitle={gameCase.title}
           canAccuse={canAccuse}
           completedSteps={currentStepIndex}
-          totalSteps={Math.max(gameCase.gameplay.guide.steps.length - 1, 0)}
-          onAnalyzeSuspects={() => {
-            if (canAccuse) setIsSuspectModalOpen(true)
-          }}
+          totalSteps={totalQuerySteps}
+          onAnalyzeSuspects={() => setIsSuspectModalOpen(true)}
+          onOpenHelp={() => setShowTutorial(true)}
         />
 
-        <section className="mb-6 border-l-4 border-[#c5a56e] bg-[#292824] px-5 py-5 md:px-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0 flex-1">
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="font-mono text-[10px] font-bold tracking-widest text-[#c5a56e]">SUA MISSÃO · ETAPA {currentStepIndex + 1}</span>
-                <span className="border border-[#504c43] px-2 py-1 font-mono text-[9px] text-[#bdb19e]">{currentStepIndex + 1} de {gameCase.gameplay.guide.steps.length}</span>
-              </div>
-              <h2 className="mb-2 font-serif text-xl font-bold text-[#e6dfcc]">{currentStep.title}</h2>
-              <p className="max-w-3xl text-sm leading-6 text-[#d9ccb0]">{currentStep.objective}</p>
-              {currentStep.suggestedTable && <p className="mt-3 text-xs text-[#bdb19e]">Ponto de partida sugerido: <strong className="font-mono text-[#c5a56e]">{currentStep.suggestedTable}</strong></p>}
-            </div>
-            <button type="button" onClick={() => setShowTutorial(true)} className="shrink-0 self-start border border-[#625c50] px-4 py-2 font-mono text-xs text-[#e6dfcc] transition hover:bg-white/5">? Como jogar</button>
-          </div>
-          <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-white/10 pt-4 text-xs text-[#bdb19e]">
-            <span className="font-mono text-[#c5a56e]">PRÓXIMOS PASSOS</span><span>1. Explore os dados</span><span aria-hidden="true">→</span><span>2. Monte a consulta</span><span aria-hidden="true">→</span><span>3. Analise o resultado</span>
-          </div>
-        </section>
-
-        <div className="mb-10">
-          <button type="button" aria-expanded={showDatabase} aria-controls="database-explorer-panel" onClick={() => setShowDatabase((open) => !open)} className="flex w-full items-center justify-between gap-3 border border-[#625c50] bg-[#292824] px-4 py-3 text-left transition hover:border-[#c5a56e]">
-            <span className="flex min-w-0 items-center gap-3">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#40392c] text-[#c5a56e]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg></span>
-              <span><span className="block font-mono text-xs font-bold text-[#e6dfcc]">Explorar banco de dados</span><span className="mt-1 block text-xs text-[#bdb19e]">{scenario.tables.length} tabelas disponíveis{currentStep.suggestedTable ? ` · sugestão: ${currentStep.suggestedTable}` : ''}</span></span>
+        <section className="mb-5 border-l-4 border-[#c5a56e] bg-[#292824] px-4 py-5 sm:px-6">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <span className="font-mono text-[10px] font-bold tracking-widest text-[#c5a56e]">
+              {canAccuse ? 'INVESTIGAÇÃO CONCLUÍDA' : 'MISSÃO ATUAL'}
             </span>
-            <span className="font-mono text-xs text-[#c5a56e]">{showDatabase ? 'FECHAR −' : 'ABRIR +'}</span>
-          </button>
-          {showDatabase && <div id="database-explorer-panel" className="mt-2 max-w-3xl"><DatabaseExplorer databaseName="bell_db" tables={scenario.tables} suggestedTable={currentStep.suggestedTable} /></div>}
-        </div>
-
-        <section className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_280px]">
-          <div className="min-w-0 space-y-5">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowSqlCheatSheet(true)}
-                aria-haspopup="dialog"
-                className="border border-[#625c50] bg-[#292824] px-4 py-2 font-mono text-xs text-[#e6dfcc] transition hover:border-[#c5a56e] hover:text-[#c5a56e]"
-              >
-                ? Cola SQL
-              </button>
-            </div>
-            <SqlBuilder tables={scenario.tables} paletteConfig={currentStep.sqlPalette} disabled={isDatabaseLoading || Boolean(databaseError)} onExecute={handleExecuteQuery} />
-            {feedback && <div role="status" className="border-l-2 border-[#b79762] bg-[#282824] px-4 py-3"><p className="mb-1 font-mono text-[9px] font-bold tracking-widest text-[#c5a56e]">ANÁLISE DA CONSULTA</p><p className="text-sm leading-5 text-[#e6dfcc]">{feedback}</p></div>}
-            <div ref={resultsRef} className="scroll-mt-6" aria-live="polite">
-              <QueryResults result={queryResult} error={queryError ?? databaseError} isDatabaseLoading={isDatabaseLoading} />
-            </div>
+            <span className="font-mono text-[10px] text-[#bdb19e]">
+              {canAccuse ? 'Etapas concluídas' : `Etapa ${currentStepIndex + 1} de ${totalQuerySteps}`}
+            </span>
           </div>
-          <div className="xl:sticky xl:top-5"><InvestigationGuide config={gameCase.gameplay.guide} currentStepIndex={currentStepIndex} consultedTables={consultedTables} /></div>
+          <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-[#504c43]" role="progressbar" aria-label="Progresso da investigação" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+            <div className="h-full bg-[#8ca47d] transition-all" style={{ width: `${progress}%` }} />
+          </div>
+          <h2 className="mb-2 font-serif text-xl font-bold text-[#e6dfcc] sm:text-2xl">{currentStep.title}</h2>
+          <p className="max-w-3xl text-sm leading-6 text-[#d9ccb0]">{currentStep.objective}</p>
+          <div className="mt-4 border-t border-white/10 pt-3">
+            <p className="mb-1 font-mono text-[9px] font-bold tracking-widest text-[#c5a56e]">{currentStep.concept}</p>
+            <p className="text-xs leading-5 text-[#bdb19e]">{currentStep.explanation}</p>
+          </div>
+          {currentStep.suggestedTable && !canAccuse && (
+            <p className="mt-3 text-xs text-[#bdb19e]">
+              Comece pela tabela <strong className="font-mono text-[#c5a56e]">{currentStep.suggestedTable}</strong>.
+            </p>
+          )}
         </section>
+
+        {!canAccuse && (
+          <div className="mb-5 overflow-hidden border border-[#625c50] bg-[#292824]">
+            <button
+              type="button"
+              aria-expanded={showDatabase}
+              aria-controls="database-explorer-panel"
+              onClick={() => setShowDatabase(open => !open)}
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition hover:bg-white/5"
+            >
+              <span>
+                <span className="block font-mono text-xs font-bold text-[#e6dfcc]">Explorar banco de dados</span>
+                <span className="mt-1 block text-xs text-[#bdb19e]">
+                  {scenario.tables.length} tabelas · abra uma tabela para consultar suas colunas e registros
+                </span>
+              </span>
+              <span className="font-mono text-xs text-[#c5a56e]">{showDatabase ? 'FECHAR −' : 'ABRIR +'}</span>
+            </button>
+            {showDatabase && (
+              <div id="database-explorer-panel" className="border-t border-white/10 p-3 sm:p-4">
+                <DatabaseExplorer databaseName="bell_db" tables={scenario.tables} suggestedTable={currentStep.suggestedTable} />
+              </div>
+            )}
+          </div>
+        )}
+
+        {!canAccuse && (
+          <SqlBuilder
+            key={currentStep.id}
+            tables={scenario.tables}
+            paletteConfig={currentStep.sqlPalette}
+            disabled={isDatabaseLoading || Boolean(databaseError)}
+            onExecute={handleExecuteQuery}
+          />
+        )}
+
+        {feedback && (
+          <div role="status" className="mt-4 border-l-2 border-[#8ca47d] bg-[#292824] px-4 py-3">
+            <p className="mb-1 font-mono text-[9px] font-bold tracking-widest text-[#c5a56e]">FEEDBACK DA ETAPA</p>
+            <p className="text-sm leading-5 text-[#e6dfcc]">{feedback}</p>
+          </div>
+        )}
+
+        {(queryResult || queryError || databaseError || isDatabaseLoading || canAccuse) && (
+          <div className="mt-5">
+            {canAccuse && (
+              <p className="mb-3 border border-[#625c50] bg-[#292824] px-4 py-3 text-sm leading-6 text-[#d9ccb0]">
+                Você concluiu as consultas desta investigação. Revise as evidências e use <strong className="text-[#c5a56e]">Analisar suspeitos</strong> para apresentar sua conclusão.
+              </p>
+            )}
+            <QueryResults result={queryResult} error={queryError ?? databaseError} isDatabaseLoading={isDatabaseLoading} />
+          </div>
+        )}
       </div>
 
       {showTutorial && <GameplayTutorial onClose={closeTutorial} />}
 
-      {showSqlCheatSheet && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/75 p-4"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setShowSqlCheatSheet(false)
-          }}
-        >
-          <section
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="sql-cheat-sheet-title"
-            className="my-auto max-h-[85vh] w-full max-w-xl overflow-y-auto border border-[#625c50] bg-[#292824] p-5 text-[#e6dfcc] shadow-2xl sm:p-7"
-          >
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <p className="mb-1 font-mono text-[9px] tracking-[0.2em] text-[#c5a56e]">GUIA DE CONSULTAS</p>
-                <h2 id="sql-cheat-sheet-title" className="font-serif text-2xl font-bold">Cola SQL</h2>
-                <p className="mt-2 text-sm leading-5 text-[#bdb19e]">Use estes exemplos como referência e adapte-os aos dados da investigação. Eles não revelam quem é o culpado.</p>
-              </div>
-              <button type="button" onClick={() => setShowSqlCheatSheet(false)} aria-label="Fechar cola SQL" className="border border-[#625c50] px-3 py-2 text-sm hover:border-[#c5a56e]">Fechar ×</button>
-            </div>
-
-            <div className="space-y-4">
-              <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
-                <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">1. CONSULTAR UMA TABELA</h3>
-                <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT *
-FROM ${currentStep.suggestedTable ?? 'nome_da_tabela'};`}</code></pre>
-                <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>SELECT</strong> escolhe o que mostrar. <strong>FROM</strong> indica de qual tabela vêm os dados. O asterisco (*) significa todas as colunas.</p>
-              </article>
-
-              <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
-                <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">2. FILTRAR RESULTADOS</h3>
-                <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT *
-FROM ${currentStep.suggestedTable ?? 'nome_da_tabela'}
-WHERE coluna = 'valor';`}</code></pre>
-                <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>WHERE</strong> mostra apenas as linhas que atendem à condição. Troque coluna, operador e valor pelos dados que deseja investigar.</p>
-              </article>
-
-              {currentStep.sqlPalette.keywords.includes('AND') && (
-                <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
-                  <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">3. COMBINAR CONDIÇÕES</h3>
-                  <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT *
-FROM ${currentStep.suggestedTable ?? 'nome_da_tabela'}
-WHERE condicao_1
-  AND condicao_2;`}</code></pre>
-                  <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>AND</strong> exige que as duas condições sejam verdadeiras.</p>
-                </article>
-              )}
-
-              {currentStep.sqlPalette.keywords.includes('JOIN') && (
-                <article className="border-l-2 border-[#c5a56e] bg-[#181714] p-4">
-                  <h3 className="mb-2 font-mono text-xs font-bold text-[#c5a56e]">4. RELACIONAR TABELAS</h3>
-                  <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#e6dfcc]"><code>{`SELECT tabela_a.coluna, tabela_b.coluna
-FROM tabela_a
-JOIN tabela_b ON tabela_a.id = tabela_b.tabela_a_id;`}</code></pre>
-                  <p className="mt-2 text-xs leading-5 text-[#bdb19e]"><strong>JOIN</strong> combina registros relacionados. A condição após <strong>ON</strong> explica como as tabelas se conectam.</p>
-                </article>
-              )}
-
-              <p className="border-t border-white/10 pt-4 text-xs leading-5 text-[#bdb19e]">Dica: comece pela tabela sugerida na missão. Leia as colunas no explorador do banco e formule uma pergunta específica antes de executar a consulta.</p>
-            </div>
-          </section>
-        </div>
+      {isSuspectModalOpen && canAccuse && suspectsTable && (
+        <SuspectModal
+          suspects={suspectsTable.rows}
+          initialSelectedId={selectedCulpritId}
+          onClose={() => setIsSuspectModalOpen(false)}
+          onConfirm={handleAccuse}
+        />
       )}
-
-      {isSuspectModalOpen &&
-        canAccuse &&
-        suspectsTable && (
-          <SuspectModal
-            suspects={
-              suspectsTable.rows
-            }
-            initialSelectedId={
-              selectedCulpritId
-            }
-            onClose={() =>
-              setIsSuspectModalOpen(
-                false,
-              )
-            }
-            onConfirm={
-              handleAccuse
-            }
-          />
-        )}
 
       {accusationResult && (
         <AccusationResultModal
-          correct={
-            accusationResult.correct
-          }
-          suspectName={
-            accusationResult
-              .suspectName
-          }
+          correct={accusationResult.correct}
+          suspectName={accusationResult.suspectName}
           explanation={accusationResult.explanation}
           evidence={accusationResult.evidence}
           onClose={() => {
