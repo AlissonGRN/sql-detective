@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { SqlBlock } from './SqlBlock'
 import type { GameTable } from '../../types/database'
 import type { SqlBlockDefinition } from '../../types/sql'

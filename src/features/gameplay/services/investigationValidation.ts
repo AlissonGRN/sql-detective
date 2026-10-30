@@ -9,6 +9,7 @@ export interface InvestigationFeedback {
 
 export function evaluateInvestigationQuery(step: InvestigationStepConfig, query: string, result: SqlQueryResult): InvestigationFeedback {
   const normalized = query.replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ').trim()
+  const normalizedForConditions = normalizeConditionSpacing(normalized)
   const tableMatches = [...normalized.matchAll(/\b(?:FROM|JOIN)\s+([a-zA-Z_]\w*)/gi)]
   const tableNames = tableMatches.map(match => match[1].toLowerCase())
   const consultedTables = step.requiredTables.filter(table => tableNames.includes(table.toLowerCase()))
@@ -21,7 +22,7 @@ export function evaluateInvestigationQuery(step: InvestigationStepConfig, query:
   const validation = step.validation
   if (validation) {
     for (const keyword of validation.requiredKeywords ?? []) {
-      const pattern = new RegExp(`\\b${escapeRegExp(keyword).replace(/\\s+/g, '\\s+')}\\b`, 'i')
+      const pattern = new RegExp('\\b' + escapeRegExp(keyword) + '\\b', 'i')
       if (!pattern.test(normalized)) {
         return { success: false, consultedTables, message: `Use o bloco ${keyword.toUpperCase()} para praticar o conceito desta etapa.` }
       }
@@ -29,6 +30,15 @@ export function evaluateInvestigationQuery(step: InvestigationStepConfig, query:
 
     if (validation.requireWhere && !/\bWHERE\b/i.test(normalized)) {
       return { success: false, consultedTables, message: 'Esta etapa precisa de um filtro. Adicione o bloco WHERE e informe a condição.' }
+    }
+
+    if (validation.requiredConditions?.length) {
+      const missingConditions = validation.requiredConditions.filter(condition => {
+        return !normalizedForConditions.includes(normalizeConditionSpacing(condition))
+      })
+      if (missingConditions.length > 0) {
+        return { success: false, consultedTables, message: 'Confira o campo, o operador e o valor usados no filtro ou no relacionamento desta etapa.' }
+      }
     }
 
     if (validation.requiredSelectItems?.length) {
@@ -80,6 +90,14 @@ export function evaluateInvestigationQuery(step: InvestigationStepConfig, query:
     consultedTables,
     message: 'Consulta correta para esta etapa. Observe os registros encontrados: eles são pistas para a investigação.',
   }
+}
+
+function normalizeConditionSpacing(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/\s*(>=|<=|<>|!=|=|>|<)\s*/g, ' $1 ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 function escapeRegExp(value: string) {

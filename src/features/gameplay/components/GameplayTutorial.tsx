@@ -4,7 +4,14 @@ interface GameplayTutorialProps {
   onClose: () => void
 }
 
-const pages = [
+interface TutorialPage {
+  title: string
+  body: string
+  tip: string
+  example?: string
+}
+
+const pages: TutorialPage[] = [
   {
     title: 'Uma missão por vez',
     body: 'Cada etapa apresenta uma tarefa pequena e explica o conceito SQL necessário. Siga a missão atual; você não precisa resolver toda a investigação de uma vez.',

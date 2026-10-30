@@ -156,6 +156,9 @@
               "column": "id",
               "expectedValues": [
                 2
+              ],
+              "requiredConditions": [
+                "occupation = 'Segurança'"
               ]
             }
           },
@@ -199,7 +202,10 @@
               "expectedValues": [
                 2
               ],
-              "expectedRowCount": 2
+              "expectedRowCount": 2,
+              "requiredConditions": [
+                "suspect_id = 2"
+              ]
             }
           },
           {
@@ -242,7 +248,10 @@
               "expectedValues": [
                 2
               ],
-              "expectedRowCount": 1
+              "expectedRowCount": 1,
+              "requiredConditions": [
+                "suspect_id = 2"
+              ]
             }
           },
           {
@@ -343,6 +352,9 @@
                 2,
                 4,
                 5
+              ],
+              "requiredConditions": [
+                "exit_time >= '19:00'"
               ]
             }
           },
@@ -388,6 +400,9 @@
                 2,
                 4,
                 5
+              ],
+              "requiredConditions": [
+                "room_id = 3"
               ]
             }
           },
@@ -438,6 +453,10 @@
               "expectedValues": [
                 2,
                 4
+              ],
+              "requiredConditions": [
+                "room_id = 3",
+                "time >= '19:00'"
               ]
             }
           },
@@ -481,7 +500,10 @@
               "expectedValues": [
                 4
               ],
-              "expectedRowCount": 2
+              "expectedRowCount": 2,
+              "requiredConditions": [
+                "suspect_id = 4"
+              ]
             }
           },
           {
@@ -524,7 +546,10 @@
               "expectedValues": [
                 4
               ],
-              "expectedRowCount": 1
+              "expectedRowCount": 1,
+              "requiredConditions": [
+                "suspect_id = 4"
+              ]
             }
           },
           {
@@ -664,6 +689,9 @@
               "expectedValues": [
                 2,
                 3
+              ],
+              "requiredConditions": [
+                "amount >= 5000"
               ]
             }
           },
@@ -708,7 +736,10 @@
               "expectedValues": [
                 2
               ],
-              "expectedRowCount": 1
+              "expectedRowCount": 1,
+              "requiredConditions": [
+                "status = 'REJECTED'"
+              ]
             }
           },
           {
@@ -763,6 +794,10 @@
               "column": "suspect_id",
               "expectedValues": [
                 3
+              ],
+              "requiredConditions": [
+                "payments.bid_id = bids.id",
+                "payments.status = 'REJECTED'"
               ]
             }
           },
@@ -806,7 +841,10 @@
               "expectedValues": [
                 3
               ],
-              "expectedRowCount": 1
+              "expectedRowCount": 1,
+              "requiredConditions": [
+                "id = 3"
+              ]
             }
           },
           {

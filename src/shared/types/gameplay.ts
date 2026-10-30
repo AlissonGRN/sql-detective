@@ -22,6 +22,7 @@ export interface InvestigationStepConfig {
     expectedValues?: Array<string | number>
     requireWhere?: boolean
     requiredKeywords?: string[]
+    requiredConditions?: string[]
     requiredSelectItems?: string[]
     expectedColumns?: string[]
     expectedRowCount?: number
